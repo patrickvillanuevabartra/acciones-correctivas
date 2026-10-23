@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acciones Correctivas y Mejora · SGOE FI-URP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#0f8f5e;--brand-d:#0a6b46;--brand-l:#e3f4ec;
+  --bg:#f4f6f5;--card:#ffffff;--ink:#14231c;--muted:#4f5d56;--line:#d6dedA;--field:#ffffff;
+  --ok:#0f8f5e;--run:#2563eb;--wait:#c26a04;--new:#7c3aed;--bad:#c81e1e;--gray:#8a97a6;
+  --note-bg:#f1f7f4;--warn-bg:#fff6e5;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1512;--card:#16201b;--ink:#e6efe9;--muted:#a7b8af;--line:#2b3a32;--brand-l:#123526;--field:#101915;--note-bg:#13261d;--warn-bg:#2e2410;--shadow:none;}}
+:root[data-theme="dark"]{--bg:#0e1512;--card:#16201b;--ink:#e6efe9;--muted:#a7b8af;--line:#2b3a32;--brand-l:#123526;--field:#101915;--note-bg:#13261d;--warn-bg:#2e2410;--shadow:none;}
+*{box-sizing:border-box}
+html{zoom:1.22}
+@media (max-width:760px){html{zoom:1}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.55}
+.mono{font-family:'IBM Plex Mono',monospace}
+button{font:inherit}
+header{background:linear-gradient(120deg,#0a6b46,#0f8f5e 55%,#14a870);color:#fff;padding:22px 0 60px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+header small{opacity:.9;letter-spacing:.05em;text-transform:uppercase;font-size:11px}
+header h1{margin:6px 0 4px;font-size:24px;font-weight:700;line-height:1.25}
+header p{margin:0;opacity:.92;max-width:680px}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hb{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:9px;padding:8px 14px;cursor:pointer;font-weight:500}
+.hb:hover{background:rgba(255,255,255,.25)}
+.hb.solid{background:#fff;color:var(--brand-d);border-color:#fff;font-weight:600}
+.conn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;background:rgba(0,0,0,.18);padding:4px 10px;border-radius:999px}
+.conn i{width:8px;height:8px;border-radius:50%;background:#facc15;display:inline-block}
+.conn.on i{background:#4ade80}
+.banner{margin:14px 0 0;padding:12px 14px;border-radius:12px;background:var(--warn-bg);border:1px solid #e8c27a;font-size:13.5px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:-42px}
+.kpi{background:var(--card);border-radius:14px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.kpi .v{font-size:32px;font-weight:700;line-height:1.1}
+.kpi .l{font-weight:600;font-size:14px}
+.kpi .s{font-size:13px;color:var(--muted)}
+.kpi .n{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted);line-height:1.5}
+.kpi .n b{color:var(--ink);font-weight:600}
+.guide{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.guide summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px}
+.guide summary::before{content:"▸";color:var(--brand);transition:transform .15s}
+.guide[open] summary::before{transform:rotate(90deg)}
+.guide .gb{padding:0 18px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px 22px;font-size:13.5px}
+.guide .gb h4{margin:0 0 4px;font-size:13.5px;color:var(--brand)}
+.guide .gb p{margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-top:14px}
+.panel{background:var(--card);border-radius:14px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.panel h2{font-size:15.5px;margin:0 0 4px}
+.panel .pn{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+.donut-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.donut{width:150px;height:150px;border-radius:50%;position:relative;flex:none}
+.donut::after{content:"";position:absolute;inset:26px;background:var(--card);border-radius:50%}
+.donut b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;font-size:28px;line-height:1}
+.donut b small{font-size:11.5px;color:var(--muted);font-weight:400;margin-top:4px}
+.legend{display:flex;flex-direction:column;gap:7px;font-size:13.5px;flex:1;min-width:170px}
+.legend button{display:flex;align-items:center;gap:8px;cursor:pointer;background:none;border:none;color:var(--ink);padding:3px 4px;border-radius:6px;text-align:left}
+.legend button:hover,.legend button.on{background:var(--brand-l)}
+.dot{width:11px;height:11px;border-radius:3px;flex:none;display:inline-block}
+.bar{margin:9px 0;cursor:pointer;padding:2px 4px;border-radius:6px}
+.bar:hover,.bar.on{background:var(--brand-l)}
+.bar .t{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:4px}
+.track{height:10px;background:var(--line);border-radius:6px;overflow:hidden;display:flex}
+.track i{display:block;height:100%}
+.tl{max-height:310px;overflow:auto;padding-right:4px}
+.tl .it{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:9px 4px;border-bottom:1px dashed var(--line);font-size:13px;cursor:pointer;border-radius:6px}
+.tl .it:hover{background:var(--brand-l)}
+.date{font-weight:600}
+.late{color:var(--bad)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 12px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13.5px}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+select,input,textarea{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:9px;padding:8px 10px;font:inherit;font-size:14px;width:100%}
+.filters select{width:auto}
+.filters input[type=search]{flex:1;min-width:200px;width:auto}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+select:focus,input:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+label.chk{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer}
+label.chk input{width:auto}
+.count{font-size:13px;color:var(--muted);margin:0 0 10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;border-top:5px solid var(--gray)}
+.card.arch{opacity:.7}
+.card .h{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.code{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
+.tag.AC{background:#fde8e8;color:#a61b1b}.tag.OM{background:#ede9fe;color:#5b21b6}.tag.ARCH{background:var(--line);color:var(--muted)}
+.card .d{font-size:13.5px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.meta{font-size:12.5px;color:var(--muted)}
+.st{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.prog{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.prog .track{flex:1;height:8px}
+.cbtns{display:flex;gap:8px;margin-top:4px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:500;font-size:13.5px}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{background:var(--brand-d);color:#fff}
+.btn.dan{color:var(--bad);border-color:#efb4b4}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+dialog{border:none;border-radius:16px;padding:0;max-width:900px;width:calc(100% - 24px);background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog.sm{max-width:460px}
+dialog[open]{display:flex;flex-direction:column;max-height:calc(100vh / 1.22 - 24px)}
+@media (max-width:760px){dialog[open]{max-height:calc(100vh - 24px)}}
+dialog>form{display:flex;flex-direction:column;min-height:0;flex:1}
+dialog .mb{flex:1;min-height:0;max-height:none}
+dialog::backdrop{background:rgba(10,20,15,.55)}
+.mh{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mh h2{margin:4px 0 2px;font-size:20px}
+.mb{padding:18px 22px;max-height:66vh;overflow:auto}
+.mf{padding:14px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.mb h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--brand);margin:18px 0 6px}
+.mb h3:first-child{margin-top:0}
+.mb p{margin:0 0 6px;white-space:pre-line}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 16px;font-size:13.5px}
+.kv div span{display:block;font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600}
+.x{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1}
+.steps{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.steps div{flex:1;min-width:70px;text-align:center;font-size:11.5px;padding:6px 4px;border-radius:6px;background:var(--line);color:var(--muted)}
+.steps div.done{background:var(--brand);color:#fff}
+.steps div.cur{background:var(--wait);color:#fff}
+/* formulario */
+.sec{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.sec legend{font-weight:700;color:var(--brand);padding:0 6px;font-size:14.5px}
+.sec .si{font-size:12.5px;color:var(--muted);margin:-2px 0 10px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 16px}
+.fi{display:flex;flex-direction:column;gap:3px}
+.fi.full{grid-column:1/-1}
+.fi>label{font-weight:600;font-size:13.5px}
+.fi>label .req{color:var(--bad)}
+.fi .hl{font-size:12px;color:var(--muted);line-height:1.45;background:var(--note-bg);border-radius:7px;padding:5px 8px;margin-bottom:2px}
+.act{border:1px dashed var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--bg)}
+.act .ah{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#14231c;color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:90vw;display:none}
+.toast.err{background:var(--bad)}
+.loading{padding:40px;text-align:center;color:var(--muted);font-size:15px}
+footer{color:var(--muted);font-size:12.5px;text-align:center;padding:30px 16px}
+@media (max-width:600px){header h1{font-size:20px}.tl .it{grid-template-columns:80px 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <small>Universidad Ricardo Palma · Facultad de Ingeniería · SGOE ISO 21001</small>
+      <h1>Acciones correctivas y oportunidades de mejora</h1>
+      <p>Seguimiento de los expedientes FI-GCA-FR-007: qué se encontró, qué se está haciendo para corregirlo o mejorarlo, y si funcionó.</p>
+      <div class="conn" id="conn"><i></i><span>Conectando…</span></div>
+    </div>
+    <div class="hbtns">
+      <button class="hb solid" id="bNuevo">＋ Nuevo expediente</button>
+      <button class="hb" id="bLogin">Ingresar para editar</button>
+      <button class="hb" id="bReload" title="Volver a leer los datos de QuintaDB">↻ Actualizar</button>
+      <button class="hb" id="bTheme" title="Cambiar entre fondo claro y oscuro">◐ Tema</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="kpis" id="kpis"></section>
+  <div id="banner"></div>
+
+  <details class="guide">
+    <summary>¿Cómo leer este tablero? (guía rápida)</summary>
+    <div class="gb">
+      <div><h4>Acción correctiva (AC)</h4><p>Se abre cuando se detectó un incumplimiento (una «no conformidad»), por ejemplo en una auditoría. Busca eliminar la causa para que el problema no se repita.</p></div>
+      <div><h4>Oportunidad de mejora (OM)</h4><p>Se abre cuando no hay incumplimiento, pero algo puede hacerse mejor. Por eso no lleva análisis de causa raíz.</p></div>
+      <div><h4>Plan de acción</h4><p>Es la lista de actividades concretas, cada una con su responsable y su fecha. La barra de cada tarjeta muestra cuántas ya se hicieron.</p></div>
+      <div><h4>Eficacia</h4><p>Después de hacer las actividades, se comprueba si realmente resolvieron el problema. Solo entonces el expediente se cierra como «eficaz».</p></div>
+      <div><h4>Colores</h4><p><span class="dot" style="background:var(--ok)"></span> cerrado eficaz · <span class="dot" style="background:var(--run)"></span> hecho, falta comprobar · <span class="dot" style="background:var(--wait)"></span> en ejecución · <span class="dot" style="background:var(--new)"></span> plan por aprobar.</p></div>
+      <div><h4>Para ver el detalle</h4><p>Haga clic en «Ver detalle» de cualquier tarjeta. Para cambiar datos, use «Editar» (requiere ingresar con la clave de edición).</p></div>
+    </div>
+  </details>
+
+  <section class="grid">
+    <div class="panel">
+      <h2>¿En qué etapa están los expedientes?</h2>
+      <p class="pn">Cada color es una etapa. Haga clic en una etapa para ver solo esos expedientes.</p>
+      <div class="donut-row"><div class="donut" id="donut"></div><div class="legend" id="legend"></div></div>
+    </div>
+    <div class="panel">
+      <h2>¿Dónde se originan los problemas?</h2>
+      <p class="pn">Agrupa las acciones correctivas por su tipo de causa. Una barra larga indica una causa que se repite. Verde: ya resueltas; naranja: en curso.</p>
+      <div id="fam"></div>
+    </div>
+    <div class="panel">
+      <h2>Próximas fechas a cumplir</h2>
+      <p class="pn">Actividades aún no terminadas, ordenadas por su fecha programada. En rojo: ya pasó la fecha.</p>
+      <div class="tl" id="tl"></div>
+    </div>
+  </section>
+
+  <div class="filters">
+    <button class="chip on" data-t="">Todos</button>
+    <button class="chip" data-t="AC">Acciones correctivas</button>
+    <button class="chip" data-t="OM">Oportunidades de mejora</button>
+    <select id="fEst" aria-label="Filtrar por etapa"><option value="">Todas las etapas</option></select>
+    <select id="fFam" aria-label="Filtrar por tipo de causa"><option value="">Todos los tipos de causa</option></select>
+    <input type="search" id="q" placeholder="Buscar por código, proceso o palabra…" aria-label="Buscar">
+    <label class="chk"><input type="checkbox" id="fArch"> Mostrar archivados</label>
+  </div>
+  <p class="count" id="count"></p>
+  <section class="cards" id="cards"><div class="loading">Cargando expedientes…</div></section>
+</main>
+
+<dialog id="dlg"><div class="mh" id="mh"></div><div class="mb" id="mb"></div><div class="mf" id="mf"></div></dialog>
+<dialog id="dEdit"><form id="fEdit" method="dialog"><div class="mh" id="eh"></div><div class="mb" id="eb"></div><div class="mf"><button type="button" class="btn" id="eCancel">Cancelar</button><button type="submit" class="btn pri" id="eSave">Guardar en QuintaDB</button></div></form></dialog>
+<dialog id="dLogin" class="sm"><form id="fLogin" method="dialog">
+  <div class="mh"><div><h2>Ingresar para editar</h2><div class="meta">Solo para miembros del Comité SGOE y responsables autorizados.</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
+  <div class="mb">
+    <div class="fi" style="margin-bottom:12px"><label for="lCorreo">Correo institucional</label><input id="lCorreo" type="email" autocomplete="email" required placeholder="nombre@urp.edu.pe"></div>
+    <div class="fi"><label for="lClave">Clave de edición</label><div class="hl">La entrega el coordinador del aplicativo. Se recuerda solo mientras esta pestaña esté abierta.</div><input id="lClave" type="password" autocomplete="current-password" required></div>
+    <p id="lErr" class="late" style="margin-top:10px"></p>
+  </div>
+  <div class="mf"><button type="button" class="btn" data-close>Cancelar</button><button type="submit" class="btn pri" id="lBtn">Ingresar</button></div>
+</form></dialog>
+<dialog id="dConf" class="sm"><div class="mh"><div><h2 id="cT"></h2></div></div><div class="mb"><p id="cM"></p></div><div class="mf"><button class="btn" id="cNo">Cancelar</button><button class="btn pri" id="cSi">Confirmar</button></div></dialog>
+<div class="toast" id="toast"></div>
+
+<footer>Comité SGOE — Facultad de Ingeniería URP · Tabla «Solicitud de acciones correctivas y oportunidades de mejora» en QuintaDB · <span id="foot"></span></footer>
+
+<script>
+/* ═══════════ CONFIGURACIÓN ═══════════
+   Pegue aquí la URL de la aplicación web del Apps Script (termina en /exec). */
+const PROXY_URL = "";
+
+/* Campos de la tabla principal (IDs de QuintaDB) */
+const F={codigo:"dcSSo_EsLcW5T4WRjVtKWN",fecha:"ddGazmW6bdWOy7tSk8da9D",fuente:"cfWQm8WPTmWRXUkmk0WRzR",tipo:"aRuw4uEmndjyo0mmotWPHw",clasif:"ddM8oXW5vnWOlcMmotpmkq",proceso:"cgW6qoyq1dQyJcOuikvXzq",familia:"cRWQKSECndW7_cHHuDWRXe",requisito:"caE8kPWR1gn4kBzftdMSko",generado:"chW5rJW4TdQ6HeWP3dVCkk",aceptado:"ddKbDxgufdLlZcKmoCjqrl",descNC:"ddNaxcSmnhW6VdHSoCumk_",descOM:"cFfY9GuZLjo4NdOG_cV1bY",situacionV:"cfESobWQvdRQbIv8oeCuGm",reqAnalisis:"cssmkxxZbdS4k9WPJcOSkY",reqCorr:"ddHHZcSCndW5FcQmkDBmoq",correccion:"ccEmohW6zdR6VdNWldVxfc",fCorr:"afimoxW7zcOjpdOSo7y8oG",metodo:"dcHmo4W7PpWPVdNNbbW5ON",analisis:"bZWPJdUmnghOkseqddUSoV",causa:"dcVColW7roW7H3FCoCvu4-",criterio:"aGW7BcT8nbWOVdTCkyEYij",evRev:"ayi8kNoSnapApdJ0JcNZeu",evPrev:"ceAXm2W4bdNikvfMSItSo3",fVerif:"dcMefewSjhWRypACkQWOCn",respVerif:"ddH8k6oSjluykAwmoWlmoo",resVerif:"cfWOVcOMjjlik4m2ddNCkh",obsVerif:"ddQmoMcSjmWPGAidRdS8oZ",periodo:"ddSSoCWQrcOQHPW5BcHdfg",fProgEf:"cWEx3cON5fmioOFeDUW659",fRealEf:"cZqCkaW4LdQ4oqyfRdSmku",resEf:"ddGSkuW7vmW4qEerVdTfOk",obsEf:"dcUwFcJc1bW75flMJcJmkL",fCierre:"cCWONcGSjjxiJcPdvKvJqC",respCierre:"dcTmofrmnfWQDoWQi0W7Ol",resCierre:"dcUd44W4XdNBDxnLKHaXvt",obsCierre:"c1WQ_cIXHpeyoLW4BdOSkZ",estado:"cBWPtdStfdL4kStJ0GnqmA",actualizado:"cKWQLLzqTgs4kdF8k-u8kp",situacion:"dcVcJdN8nazAKDWRpdH0XO"};
+/* Campos del plan de acción (subtabla) */
+const A={n:"cfumkLW6HiA4kFWRRdMSkE",accion:"b9WQ14WRzlWPinW5P-yaGY",resp:"bVfSoYW4zdTPpcGCozbSk8",prog:"bMWP8ZWRnmW6P5t8oKWOSk",ejec:"dcQd0bW75dIOofFCo4WPXM",estado:"cHasz-WQ1cTQqyWR3dJSkc",link:"bIv07dJcPcVikeWOtcS0uH",obs:"bulCoOwxzelk_cKdRcJmkb"};
+
+const I="Implementado",P="En proceso",N="No iniciado";
+const FAM={F1:"F1. Planificación y seguimiento del desempeño",F2:"F2. Supervisión académica a cargo del coordinador",F3:"F3. Control de la provisión externa al SGOE",F4:"F4. Información documentada y su registro",F5:"F5. Procesos del SGOE no implementados"};
+const EST=[
+ ["Abierta - plan de acción por aprobar","var(--new)","Plan por aprobar","El plan de actividades aún no ha sido aprobado."],
+ ["Abierta - plan de acción en ejecución","var(--wait)","En ejecución","Se están realizando las actividades del plan."],
+ ["Acciones implementadas - eficacia pendiente de evaluación","var(--run)","Hecho, falta comprobar","Las actividades se completaron; falta verificar que resolvieron el problema."],
+ ["Cerrada - eficaz","var(--ok)","Cerrado eficaz","Se comprobó que el problema se resolvió. Expediente concluido."],
+ ["Cerrada - no eficaz","var(--bad)","Cerrado no eficaz","Las acciones no resolvieron el problema; requiere un nuevo expediente."]
+];
+const OPT={
+ tipo:["Acción correctiva","Oportunidad de mejora"],
+ fuente:["Auditoria interna","Auditoria externa","Revisión del SGOE por la dirección","Verificación del Comité SGOE","Identificado por el Comité SGOE","Actividades diarias","Revisión del sistema","Quejas de los clientes","Incidente o accidente","Consejos consultivos","Salida no conforme","Otro"],
+ clasif:["No conformidad","No conformidad menor","Observación","Oportunidad de mejora"],
+ familia:Object.values(FAM),
+ siNo:["Sí","No aplica"],
+ resVerif:["Implementado","En proceso","No implementado","Parcial - acciones implementadas y acciones pendientes","Pendiente - plan de acción por iniciar"],
+ resEf:["Eficaz","No eficaz","Pendiente - evaluación programada"],
+ resCierre:["Conforme - acciones implementadas","No conforme - acciones pendientes"],
+ estado:EST.map(e=>e[0]),
+ actEstado:[N,P,I]
+};
+
+/* Copia de respaldo (se usa solo si no hay conexión con QuintaDB) */
+const SNAP_FECHA="23/10/2026";
+const CS="Comité SGOE",CSD="Comité SGOE y Decanato",RD="Por asignar en la revisión por la dirección",SUB="Subcomisión de Documentación - Comité SGOE",UCA="Unidad de Calidad y Acreditación",CSDA="Comité SGOE y Departamento Académico";
+const AUD="Auditoría interna 001-2025",CSG="Identificado por el Comité SGOE";
+const SNAP=[
+{c:"AC N°01-2026",t:"AC",cl:"No conformidad menor",fu:"Revisión del SGOE por la dirección",pr:"Planificación y seguimiento del SGOE",fa:"F1",rq:"9.1.1 y 6.2",fr:"15/03/2026",de:"El sistema no aseguró el seguimiento sistemático y oportuno de los objetivos de calidad del periodo anterior; se identificaron objetivos no ejecutados, sin alcanzar metas o sin evidencia de seguimiento periódico.",ca:"Ausencia de un mecanismo formal y sistemático para el seguimiento periódico de los objetivos de calidad, incluyendo responsables, cronograma y herramientas de monitoreo dentro del SGOE.",cr:"El mecanismo de seguimiento opera en la plataforma; cada objetivo cuenta con indicador, meta programada y responsable; y el seguimiento figura como punto de la revisión por la dirección.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Implementar en QuintaDB el registro de la programación de metas y del seguimiento de los indicadores de los objetivos de calidad, con responsable por indicador.",CS,"31/10/2026","17/10/2026",I],["Incorporar el seguimiento de los objetivos como punto obligatorio de la revisión por la dirección.",CS,"31/10/2026","17/10/2026",I]]},
+{c:"AC N°02-2026",t:"AC",cl:"No conformidad menor",fu:"Verificación del Comité SGOE",pr:"Enseñanza y aprendizaje",fa:"F2",rq:"8.1",fr:"15/03/2026",de:"En el ciclo 2026-0 los coordinadores académicos y directores de escuela no contaron con acceso al aula virtual, lo que impidió el seguimiento del cumplimiento docente (sílabos, desarrollo semanal de contenidos).",ca:"Ausencia de un procedimiento institucional que establezca la asignación de perfiles de acceso a la plataforma virtual para coordinadores y directores, necesarios para el seguimiento del proceso formativo.",cr:"Coordinadores y directores disponen del acceso, la guía vigente establece las supervisiones, la Guía Operativa Docente fija plazos y acta de cada supervisión, y la provisión del servicio está en la matriz de proveedores externos.",es:"Acciones implementadas - eficacia pendiente de evaluación",ve:I,ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II",ci:"",ac:[["Requerir formalmente a la unidad central de informática la habilitación de los perfiles de acceso para la supervisión académica.","Decanato y Escuelas Profesionales","31/10/2026","17/10/2026",I],["Aprobar, publicar y difundir la Guía para los Coordinadores de las Escuelas Profesionales.","Decanato y Escuelas Profesionales","31/10/2026","18/10/2026",I],["Incorporar la provisión del servicio de plataformas educativas a la Matriz de Proveedores Externos al SGOE.",CS,"31/10/2026","17/10/2026",I]]},
+{c:"AC N°03-2026",t:"AC",cl:"No conformidad menor",fu:"Verificación del Comité SGOE",pr:"Gestión de la información documentada del SGOE",fa:"F4",rq:"4.4, 6.1 y 9.1.1",fr:"15/10/2026",de:"Vencido el plazo comunicado, subsisten procesos sin ficha completa, indicadores sin meta programada y procesos sin riesgos identificados en QuintaDB.",ca:"El registro y la actualización de la información documentada de cada proceso no están establecidos como una obligación exigible del dueño del proceso, con periodicidad, plazo y verificación de su cumplimiento.",cr:"La obligación está asignada para todos los procesos de nivel 2; el Comité revisa periódicamente el reporte de estado; y al cierre 2026-II la plataforma muestra ficha, indicadores y riesgos de todos esos procesos.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II (28/02/2027)",ci:"",ac:[["Establecer, mediante comunicación formal del Decanato, el registro y actualización de ficha de proceso, indicadores y riesgos como obligación permanente del dueño del proceso, y completar las designaciones pendientes.","Decanato","30/11/2026","",P],["Revisar en cada sesión del Comité SGOE el reporte de estado del registro, dejando constancia en el acta.",CS,"30/11/2026","17/10/2026",I],["Incorporar el estado del registro por proceso como entrada de la revisión por la dirección.",CS,"31/10/2026","",P]]},
+{c:"AC N°01-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Planificación y seguimiento del SGOE",fa:"F1",rq:"9.1.1 y 6.2",fr:"15/06/2025",de:"No se evidencia seguimiento de los indicadores del Plan de Gestión de Objetivos de Calidad ni de la ficha del proceso de Gestión de Relaciones Institucionales (convenios y proyectos bajo convenio).",ca:"Ausencia de un mecanismo formal y sistemático de seguimiento de los objetivos e indicadores que obligue a la rendición de cuentas periódica ante la Alta Dirección.",cr:"El mecanismo opera en la plataforma; cada indicador cuenta con meta programada y responsable; y el seguimiento figura como punto de la revisión por la dirección.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Implementar en QuintaDB el registro de la programación de metas y del seguimiento de los indicadores del SGOE, con responsable por indicador.",CS,"31/10/2026","17/10/2026",I],["Incorporar el seguimiento de los objetivos e indicadores como punto obligatorio de la revisión por la dirección.",CS,"31/10/2026","17/10/2026",I]]},
+{c:"AC N°02-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión de la información documentada",fa:"F4",rq:"7.5.3",fr:"15/06/2025",de:"El FI-GCA-PR-001 Rev. 01 no mencionaba QuintaDB para el control documentario y la Lista Maestra no identificaba la Matriz de Riesgos, los protocolos de laboratorio ni el procedimiento de quejas ODACA-GCA-PR-05.",ca:"El procedimiento no contemplaba la plataforma como medio de control y difusión, ni distinguía la información documentada transversal del SGOE de la propia de cada proceso.",cr:"El procedimiento vigente incorpora la plataforma; la matriz de riesgos y el procedimiento de quejas vigente están registrados; los protocolos se controlan en la ficha del proceso que los aplica.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Actualizar el FI-GCA-PR-001, incorporando QuintaDB como medio de control y difusión y el control de la información documentada propia de cada proceso.",CS,"","10/10/2026",I],["Registrar en QuintaDB la matriz de riesgos (documento interno) y el procedimiento institucional de quejas vigente (documento externo).",CS,"","18/10/2026",I]]},
+{c:"AC N°03-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Auditoría interna del SGOE",fa:"F5",rq:"9.2.2",fr:"15/06/2025",de:"No se evidenció el establecimiento de un Programa Anual de Auditorías conforme al formato FI-GCA-FR-003.",ca:"Vacío de responsabilidad sobre la propiedad de la planificación interna obligatoria, por desalineación operativa y documental con la unidad central.",cr:"Existe el Programa de Auditorías aprobado y publicado, y el Procedimiento de Auditoría establece frecuencia, métodos, responsabilidades y requisitos de planificación e informes.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"",ac:[["Aprobar y publicar el Procedimiento de Auditoría del SGOE FI-GCA-PR-002 v02.",CSD,"31/10/2026","18/10/2026",I],["Aprobar y publicar el formato FI-GCA-FR-003 y el Programa de Auditorías del SGOE 2026-2027.",CSD,"31/10/2026","18/10/2026",I]]},
+{c:"AC N°04-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Planificación y control operacional del SGOE",fa:"F3",rq:"4.4",fr:"15/06/2025",de:"No se evidenció el involucramiento con el Sistema de los procesos de Enseñanza y Aprendizaje de Cursos PEP y Ciencias, Admisión Ordinaria y Atención de quejas a través de Defensoría Universitaria.",ca:"Poca coordinación con las áreas fuera de la Facultad comprendidas en el alcance operacional y en las interfaces del SGOE, lo que generó un vacío de control sobre los procesos compartidos.",cr:"Los tres procesos cuentan con su tratamiento registrado (inventario o Matriz de Proveedores Externos), la matriz consta aprobada y se conserva evidencia de la coordinación con cada unidad ejecutora.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Primer trimestre de 2027",ci:"",ac:[["Declarar en el Alcance del SGOE los límites respecto de los procesos provistos por unidades centrales y su tratamiento como provisión externa.",CSD,"31/10/2026","18/10/2026",I],["Incorporar al inventario las interfaces con los procesos observados (pendiente Cursos PEP y Ciencias).",CSD,"31/10/2026","",P],["Aprobar la Matriz de Proveedores Externos al SGOE (elevada al Decanato con Informe N.° 021-2026-OCAFI-D).",CSD,"31/10/2026","",P],["Determinar en la revisión por la dirección el tratamiento de la unidad que ejecuta las asignaturas de Estudios Profesionales Básicos.",CSD,"30/11/2026","",N],["Ejecutar el tratamiento determinado y registrarlo en el instrumento que corresponda.",CSD,"31/12/2026","",N],["Establecer el mecanismo de comunicación de resultados de la evaluación del aprendizaje a dicha unidad y su seguimiento.",CSD,"","",N]]},
+{c:"AC N°05-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión de riesgos y oportunidades",fa:"F1",rq:"6.1",fr:"15/06/2025",de:"No se evidenció la identificación de riesgos en Biblioteca, Compras, RSU, Laboratorios y talleres y Servicios a Terceros, ni el riesgo de incumplimiento de requisitos de convenios.",ca:"Diseño incompleto de la metodología de gestión de riesgos, que no integró el ciclo de identificación, evaluación y tratamiento para la totalidad de los procesos del alcance.",cr:"La matriz vigente cubre todos los procesos de nivel 2 y los riesgos de nivel alto tienen tratamiento, responsable y plazo.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II",ci:"",ac:[["Extender la identificación, evaluación y tratamiento de riesgos a todos los procesos del inventario vigente.","Comité SGOE y dueños de proceso","31/10/2026","",P],["Registrar en QuintaDB los riesgos y sus controles, asociados al proceso que corresponde.","Comité SGOE y dueños de proceso","31/10/2026","",P]]},
+{c:"AC N°06-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión del ambiente para la operación de los procesos",fa:"F3",rq:"7.1.4",fr:"15/06/2025",de:"Cinco condiciones del ambiente: cables expuestos en biblioteca, extintor 1-011 sin inspección, anaquel sin sujeción, dispensadores de alcohol vacíos y botiquín incompleto en el Laboratorio de Sistemas Digitales.",ca:"Inexistencia de un protocolo de gestión de los servicios compartidos con la unidad central de mantenimiento, que definiera niveles de cumplimiento y supervisión directa de la Facultad.",cr:"Las cinco condiciones fueron subsanadas, la provisión está en la matriz de proveedores externos con su frecuencia de inspección y existe un proceso de verificación periódica de los ambientes.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II",ci:"",ac:[["Gestionar ante la unidad central de mantenimiento la subsanación de las cinco condiciones y verificar su atención.","Decanato","31/10/2026","17/10/2026",I],["Incorporar los servicios de mantenimiento, limpieza y seguridad a la Matriz de Proveedores Externos.",CS,"31/10/2026","17/10/2026",I],["Incorporar al inventario el proceso de gestión de seguridad y salud en el trabajo de la Facultad.",CS,"31/10/2026","",P]]},
+{c:"AC N°07-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión del diseño y desarrollo curricular",fa:"F2",rq:"4.2",fr:"15/06/2025",de:"El autoestudio ICACIT define trece competencias específicas para Gerencia Informática, pero el sílabo solo determina cinco.",ca:"Ausencia de un procedimiento de control y validación de sílabos con lista de verificación de requisitos de partes interesadas externas antes de su publicación.",cr:"La Guía Operativa Docente obliga a elaborar el sílabo conforme al plan curricular y la Guía para Coordinadores asigna su verificación con registro.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Aprobar, publicar y difundir la Guía Operativa Docente FI-GFP-GA-001 (elaboración del sílabo conforme al plan vigente).",CSD,"20/03/2026","20/03/2026",I],["Aprobar, publicar y difundir la Guía para los Coordinadores (supervisión del sílabo contra el plan vigente).",CSD,"31/10/2026","17/10/2026",I],["Elaborar la matriz de competencias específicas por curso y ponerla a disposición de los docentes.","Directores de Escuela","31/10/2026","17/10/2026",I]]},
+{c:"AC N°08-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Enseñanza y aprendizaje",fa:"F2",rq:"8.5.2 c)",fr:"15/06/2025",de:"El material de la semana 7 de Gerencia Informática no correspondía al sílabo y no se evidenció el contenido de la semana 10 de Electrohidráulica y Electroneumática en el aula virtual.",ca:"Ausencia de un procedimiento que formalizara los accesos de supervisión y un control periódico del cumplimiento de la programación académica.",cr:"La Guía Operativa Docente obliga a evidenciar lo ejecutado vs. lo programado, la Guía para Coordinadores fija la supervisión del aula virtual y el acceso fue requerido formalmente.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Aprobar, publicar y difundir la Guía Operativa Docente (correspondencia sesión–sílabo y diapositiva semanal).",CSD,"20/03/2026","20/03/2026",I],["Aprobar, publicar y difundir la Guía para los Coordinadores (revisiones periódicas del aula virtual).",CSD,"31/10/2026","17/10/2026",I],["Requerir formalmente a la unidad central de informática el acceso de supervisión al aula virtual.","Escuelas Profesionales y Decanato","31/10/2026","17/10/2026",I]]},
+{c:"AC N°09-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Evaluación del aprendizaje",fa:"F2",rq:"8.5.1.5 e)",fr:"15/06/2025",de:"En la práctica calificada N.° 01 de Gerencia Informática no se evidenció información documentada sobre los motivos de la calificación.",ca:"Ausencia de un estándar institucional de retroalimentación que garantizara la transparencia y trazabilidad de las evaluaciones sumativas.",cr:"La Guía Operativa Docente obliga a publicar el instrumento, retroalimentar y conservar evidencia; la Guía para Coordinadores asigna la verificación de esa publicación.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Aprobar, publicar y difundir la Guía Operativa Docente (rúbrica previa, retroalimentación en dos semanas y conservación de evidencia).",CSD,"20/03/2026","20/03/2026",I],["Aprobar, publicar y difundir la Guía para los Coordinadores (verificación de rúbricas publicadas antes de la evaluación).",CSD,"31/10/2026","17/10/2026",I]]},
+{c:"AC N°10-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión de proveedores y abastecimiento",fa:"F3",rq:"8.4.1",fr:"15/06/2025",de:"No se evidenció la reevaluación de proveedores críticos prevista en el instructivo ODAM-GCM-INS-01 con el formato ODAM-GCM-FR-01.",ca:"Deficiencia en la definición de las interfaces de control y supervisión sobre procesos tercerizados o compartidos, con brecha en la trazabilidad de las evidencias de calidad.",cr:"Existen los formatos de reevaluación aplicados, la constancia del requerimiento y su respuesta, y la matriz de proveedores y la ficha del proceso establecen criterios y frecuencia.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Requerir formalmente a la Oficina de Administración y Mantenimiento la reevaluación de proveedores y sus evidencias.","Decanato","31/10/2026","18/10/2026",I],["Aprobar la Matriz de Proveedores Externos al SGOE.",CS,"31/10/2026","18/10/2026",I],["Incorporar al inventario y a la ficha el proceso de evaluación de proveedores externos.",CS,"31/10/2026","18/10/2026",I]]},
+{c:"AC N°11-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión de la programación académica",fa:"F2",rq:"8.2.2 a) y c)",fr:"15/06/2025",de:"La fórmula del sílabo de Electrohidráulica no concordaba con la del Sistema de Evaluación, y se publicó un sílabo de 2022-II en Desarrollo de Sistema Biomecánico.",ca:"Inexistencia de un protocolo de validación de inicio de ciclo que integrara accesos, coherencia de fórmulas y vigencia de documentos antes de la notificación a estudiantes.",cr:"La Guía Operativa Docente obliga a verificar la fórmula y publicar el sílabo vigente; la Guía para Coordinadores asigna la verificación de coherencia y vigencia.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Aprobar, publicar y difundir la Guía Operativa Docente (verificación de fórmulas y sílabo con ponderación).",CSD,"20/03/2026","20/03/2026",I],["Aprobar, publicar y difundir la Guía para los Coordinadores (coherencia fórmula–sílabo y vigencia).",CSD,"31/10/2026","17/10/2026",I]]},
+{c:"AC N°12-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Evaluación del aprendizaje",fa:"F2",rq:"8.1.5.4",fr:"15/06/2025",de:"No se evidenció información documentada de la práctica calificada 1 de Electrohidráulica y Electroneumática (Ingeniería Mecatrónica).",ca:"No se desarrolló un instrumento técnico-operativo que tradujera el requisito de conservar información documentada en una tarea de control periódico de la coordinación.",cr:"La Guía Operativa Docente determina las evidencias del portafolio por evaluación y la Guía para Coordinadores su supervisión periódica con registro.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Aprobar, publicar y difundir la Guía Operativa Docente (evidencias del portafolio: enunciado, mayor, menor y nota promedio).",CSD,"20/03/2026","20/03/2026",I],["Aprobar, publicar y difundir la Guía para los Coordinadores (revisión periódica del portafolio digital).",CSD,"31/10/2026","17/10/2026",I]]},
+{c:"AC N°13-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión de laboratorios y talleres",fa:"F3",rq:"7.1.5.2",fr:"15/06/2025",de:"La Máquina de Ensayo Multiaxial TECNOTEST (serie 1887-1-00078) no contaba con calibración vigente (última: 20/03/2024) y se usa en ensayos de tesis.",ca:"Inexistencia de un inventario de equipos con fines metrológicos y de un protocolo de interfaz con la unidad central de mantenimiento que permitiera priorizar calibraciones.",cr:"Existe el inventario metrológico y los equipos críticos tienen calibración vigente o el requerimiento remitido y en seguimiento.",es:"Abierta - plan de acción en ejecución",ve:"",ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II (28/02/2027)",ci:"",ac:[["Elaborar el inventario de equipos de laboratorio con fines metrológicos.","Jefes de Laboratorio","30/11/2026","",N],["Remitir a la unidad central de mantenimiento el requerimiento de calibración de los equipos críticos.","Decanato","30/11/2026","",N]]},
+{c:"AC N°14-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Prestación del servicio educativo",fa:"F5",rq:"8.6",fr:"15/06/2025",de:"No se evidenció el establecimiento de los criterios de aceptación del servicio para su liberación.",ca:"Ausencia de un protocolo de liberación del servicio que tradujera los requisitos de la norma en criterios técnicos de aceptación medibles y auditables.",cr:"Existe el procedimiento con criterios de aceptación y registro de liberación, y su aplicación está asignada a los coordinadores.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"31/10/2026",ac:[["Aprobar el documento de criterios de aceptación y liberación del servicio educativo, con su registro.",CS,"31/10/2026","17/10/2026",I]]},
+{c:"AC N°15-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Comunicación del SGOE",fa:"F4",rq:"7.4",fr:"15/06/2025",de:"El Plan de comunicación básico no identificaba las comunicaciones sobre objetivos, protocolos, cronograma de admisión y riesgos.",ca:"Ausencia de una matriz de comunicaciones del SGOE que definiera qué, quién, cuándo, cómo y a quién se comunica.",cr:"La matriz de comunicaciones vigente incluye los cuatro temas y define propósito, destinatario, oportunidad, medio, emisor y registro de cada comunicación.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"",ac:[["Elaborar, aprobar y publicar la Matriz de Comunicaciones del SGOE FI-GCA-MT-007.",CSD,"31/10/2026","18/10/2026",I]]},
+{c:"AC N°16-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión del personal docente",fa:"F4",rq:"7.1.2.2 c)",fr:"15/06/2025",de:"No se mantiene información documentada sobre el proceso de reclutamiento o selección de docentes contratados.",ca:"El procedimiento existía (FI-GCA-MN-001, 04/03/2025) pero no estaba disponible en el punto de uso: no fue publicado ni difundido a quienes conducen la selección docente.",cr:"El procedimiento vigente describe el proceso e identifica el registro del resultado, está publicado y lo conocen quienes conducen la selección.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Verificación documental a octubre de 2026",ci:"",ac:[["Actualizar el procedimiento de reclutamiento y selección docente a su versión 03 (criterios ponderados, rúbricas y Acta de Selección).",CSDA,"24/10/2026","19/10/2026",I],["Publicar el FI-GCA-PR-007 v03 en QuintaDB e incorporarlo a la Lista Maestra.",CSDA,"24/10/2026","19/10/2026",I],["Difundir el procedimiento y sus anexos a directores y coordinadores, con constancia en acta.",CSDA,"24/10/2026","",P]]},
+{c:"AC N°17-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Gestión del personal docente",fa:"F4",rq:"7.2.1 b)",fr:"15/06/2025",de:"No se evidenció la determinación de la competencia del personal docente contratado (educación, formación o experiencia).",ca:"El perfil constaba en el procedimiento vigente, pero no estaba identificado como la determinación de la competencia requerida ni disponible en el punto de uso.",cr:"Existe información documentada vigente, aprobada y publicada que determina la competencia requerida y los criterios con que se evalúa.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Verificación documental a octubre de 2026",ci:"",ac:[["Declarar en el numeral 4 del FI-GCA-PR-007 que el perfil constituye la competencia requerida, y aprobar y publicar la v03.",CSDA,"24/10/2026","19/10/2026",I],["Establecer en el numeral 4.6 los criterios de evaluación de la competencia, con ponderación y puntajes mínimos.",CSDA,"24/10/2026","19/10/2026",I],["Difundir el perfil, el procedimiento y sus rúbricas, con constancia en acta.",CSDA,"24/10/2026","",P]]},
+{c:"AC N°18-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Atención de quejas y reclamos",fa:"F3",rq:"9.1.2.2",fr:"15/06/2025",de:"No se evidenció la implementación de la Matriz de quejas, sugerencias y apelaciones prevista en el procedimiento institucional.",ca:"Gestión del sistema limitada al cumplimiento documental básico, que restó importancia al control operacional de los canales de retroalimentación como fuente de datos.",cr:"El proceso figura en el inventario con ficha; la matriz registra los 14 casos con análisis, acciones y estado; cada caso tiene su determinación de servicio no conforme; el procedimiento está controlado como externo.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II",ci:"",ac:[["Incorporar al inventario y a la ficha el proceso de atención de quejas y reclamos.",CS,"31/10/2026","17/10/2026",I],["Completar en la matriz institucional el análisis, acciones, plazos, evidencia y estado de los 14 casos.","Unidad de Calidad y Acreditación y Escuelas Profesionales","31/10/2026","",P],["Registrar el procedimiento institucional de quejas en la Lista Maestra de externos y difundirlo.",CS,"","06/10/2026",I],["Determinar para cada caso si constituye un servicio educativo no conforme y registrarlo en la FI-GCA-MT-005.",CS,"31/10/2026","",P]]},
+{c:"AC N°19-2025",t:"AC",cl:"No conformidad",fu:AUD,pr:"Revisión del SGOE por la dirección",fa:"F5",rq:"9.3",fr:"15/06/2025",de:"No se evidenció la aplicación del proceso de revisión del Sistema de Gestión por parte de la Alta Dirección.",ca:"El plan de implementación no definió un protocolo para transformar las reuniones de avance en una revisión por la dirección conforme a la norma.",cr:"Se ejecutó la revisión con todas las entradas del 9.3.2, existe acta e informe con decisiones y el proceso figura en el inventario con periodicidad anual.",es:"Abierta - plan de acción en ejecución",ve:P,ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II",ci:"",ac:[["Incorporar al inventario y a la ficha el proceso de revisión del SGOE por la dirección, con periodicidad anual.",CS,"31/10/2026","17/10/2026",I],["Ejecutar la revisión por la dirección conforme al apartado 9.3 y registrar su acta e informe.","Alta Dirección y Comité SGOE","31/10/2026","",P]]},
+{c:"OM N°01/2025",t:"OM",cl:"Oportunidad de mejora",fu:AUD,pr:"E03.03.01 Operación y Control del Sistema",fa:"",rq:"6.2",fr:"22/10/2026",de:"Relacionar los objetivos del FI-GCA-MT-003 con la política de calidad, a fin de demostrar su coherencia.",ca:"El plan de objetivos no mostraba la correspondencia entre cada objetivo y el lineamiento de la política que atiende.",cr:"El plan de objetivos vigente identifica, para cada objetivo, el lineamiento de la política al que responde, y presenta el plazo de cada actividad.",es:"Cerrada - eficaz",ve:I,ef:"Eficaz",pe:"Verificación documental a octubre de 2026",ci:"19/10/2026",ac:[["Incorporar al plan de objetivos la trazabilidad entre cada objetivo y el lineamiento de la política.",SUB,"19/10/2026","19/10/2026",I],["Incorporar al plan de objetivos el plazo de cada actividad.",SUB,"19/10/2026","19/10/2026",I]]},
+{c:"OM N°01/2026",t:"OM",cl:"Oportunidad de mejora",fu:CSG,pr:"E03.03.01 Operación y Control del Sistema",fa:"",rq:"10.1",fr:"22/10/2026",de:"Atender la nueva edición de la norma ISO 21001, determinando su impacto en el SGOE y la versión aplicable a la certificación externa prevista para abril de 2027.",ca:"El SGOE está construido sobre la edición 2018; el catálogo de ISO registra una edición posterior (07/07/2025) y consigna la 2018 como retirada.",cr:"Se cuenta con la respuesta del organismo de certificación, el análisis de brecha y un plan de adecuación aprobado antes de preparar la certificación.",es:"Abierta - plan de acción por aprobar",ve:"Pendiente - plan de acción por iniciar",ef:"Pendiente - evaluación programada",pe:"Primer trimestre de 2027",ci:"",ac:[["Consultar al organismo de certificación contra qué edición se audita una certificación inicial.",RD,"15/11/2026","",N],["Adquirir la edición vigente de la norma.",RD,"15/11/2026","",N],["Elaborar el análisis de brecha entre el SGOE y la edición aplicable.",RD,"30/11/2026","",N],["Someter a la alta dirección el plan de adecuación, con recursos y plazos.",RD,"31/12/2026","",N]]},
+{c:"OM N°02/2026",t:"OM",cl:"Oportunidad de mejora",fu:CSG,pr:"E03.03.01 Operación y Control del Sistema",fa:"",rq:"6.1",fr:"22/10/2026",de:"Depurar la matriz de riesgos, priorizar controles según nivel, identificar la evidencia de cada control y completar la reevaluación del nivel residual.",ca:"Riesgos replicados que no aplican, controles que no siguen el nivel del riesgo, controles sin evidencia identificada y ningún riesgo reevaluado.",cr:"La matriz depurada refleja los riesgos de cada unidad; los de nivel alto tienen control con evidencia; y los controlados presentan nivel residual.",es:"Abierta - plan de acción por aprobar",ve:"Pendiente - plan de acción por iniciar",ef:"Pendiente - evaluación programada",pe:"Primer trimestre de 2027",ci:"",ac:[["Depurar la matriz por unidad y escuela, retirando riesgos replicados y reformulando enunciados.",RD,"30/11/2026","",N],["Establecer el control de los riesgos de nivel alto que aún no lo tienen.",RD,"31/12/2026","",N],["Incorporar la columna de evidencia del control y completarla.",RD,"31/12/2026","",N],["Reevaluar los riesgos controlados, registrar el nivel residual y fijar la periodicidad.",RD,"31/03/2027","",N]]},
+{c:"OM N°03/2026",t:"OM",cl:"Oportunidad de mejora",fu:CSG,pr:"E06.01.01 Comunicación",fa:"",rq:"7.3",fr:"22/10/2026",de:"Reforzar los tres temas con menor nivel de acierto en la medición de la sensibilización y repetir la medición para verificar el efecto.",ca:"La medición del 21/10/2026 mostró bajo acierto en: copia no controlada, provisión externa y distinción política–objetivos de calidad.",cr:"La segunda medición supera a la inicial en los tres temas y el material consta distribuido al personal convocado.",es:"Abierta - plan de acción en ejecución",ve:"Parcial - acciones implementadas y acciones pendientes",ef:"Pendiente - evaluación programada",pe:"Diciembre de 2026",ci:"",ac:[["Elaborar un material de repaso en lenguaje llano sobre los tres temas.",SUB,"22/10/2026","22/10/2026",I],["Distribuir el material al personal convocado y conservar la constancia.",RD,"26/10/2026","",N],["Repetir la medición sobre los mismos tres temas y comparar resultados.",RD,"30/11/2026","",N],["Incorporar los tres temas a la sensibilización del siguiente periodo.",RD,"31/03/2027","",N]]},
+{c:"OM N°04/2026",t:"OM",cl:"Oportunidad de mejora",fu:CSG,pr:"S03.01.01 / S03.02.01 Gestión de personal docente y no docente",fa:"",rq:"7.2.1",fr:"22/10/2026",de:"Implementar un instrumento que recoja la retroalimentación del personal sobre las actividades realizadas para mejorar su competencia.",ca:"El SGOE registra capacitaciones y participantes, pero no la apreciación del personal ni sus necesidades de competencia, entrada exigida a la revisión por la dirección.",cr:"La revisión por la dirección dispone del resultado consolidado y el plan de capacitación siguiente incorpora al menos una necesidad derivada.",es:"Abierta - plan de acción por aprobar",ve:"Pendiente - plan de acción por iniciar",ef:"Pendiente - evaluación programada",pe:"Primer trimestre de 2027",ci:"",ac:[["Diseñar una consulta breve al personal docente y no docente sobre la capacitación recibida.",RD,"31/10/2026","",N],["Aplicar la consulta y consolidar el resultado con tasa de respuesta.",RD,"30/11/2026","",N],["Emplear el resultado en el plan de capacitación y en la revisión por la dirección.",RD,"31/12/2026","",N]]},
+{c:"OM N°05/2026",t:"OM",cl:"Oportunidad de mejora",fu:CSG,pr:"S05.01.01 Gestión documental",fa:"",rq:"7.5.3",fr:"22/10/2026",de:"Implementar en QuintaDB un flujo de trabajo para el trámite documental, con trazabilidad del estado y del plazo de atención de cada expediente.",ca:"El trámite documental no registra el estado de cada expediente ni su plazo de atención; el seguimiento depende de consultas individuales.",cr:"El trámite opera en QuintaDB con estado y plazo por expediente, y el indicador de oportunidad cuenta con meta y mediciones.",es:"Abierta - plan de acción por aprobar",ve:"Pendiente - plan de acción por iniciar",ef:"Pendiente - evaluación programada",pe:"Segundo semestre de 2027",ci:"",ac:[["Especificar el flujo: estados, responsables y plazo de atención.",RD,"31/03/2027","",N],["Implementar el flujo en QuintaDB y poner en operación el registro.",RD,"31/07/2027","",N],["Definir el indicador de oportunidad de la atención, con su meta.",RD,"31/07/2027","",N]]},
+{c:"OM N°06/2026",t:"OM",cl:"Oportunidad de mejora",fu:CSG,pr:"E03.03.01 Operación y Control del Sistema",fa:"",rq:"7.5.3",fr:"22/10/2026",de:"Digitalizar la información documentada del SGOE en QuintaDB, con listas maestras automáticas y documentos vigentes disponibles en el punto de uso.",ca:"La información se conservaba en archivos distribuidos con listas maestras manuales; ya está publicada en QuintaDB y queda pendiente ajustar el FI-GCA-PR-003.",cr:"Los documentos vigentes se consultan en QuintaDB, las listas se generan sin elaboración manual, el personal sabe dónde consultar y el FI-GCA-PR-003 lo señala.",es:"Abierta - plan de acción en ejecución",ve:"Parcial - acciones implementadas y acciones pendientes",ef:"Pendiente - evaluación programada",pe:"Primer trimestre de 2027",ci:"",ac:[["Publicar en QuintaDB los documentos aprobados y vigentes del SGOE.",UCA,"19/10/2026","19/10/2026",I],["Configurar la generación automática de las listas maestras.",UCA,"20/10/2026","20/10/2026",I],["Comunicar al personal la ubicación de los documentos vigentes y la condición de copia no controlada.",UCA,"21/10/2026","21/10/2026",I],["Incorporar en el FI-GCA-PR-003 que el registro de AC y OM se realiza en QuintaDB (FR-007 y FR-008).",UCA,"31/12/2026","",N]]},
+{c:"OM N°07/2026",t:"OM",cl:"Oportunidad de mejora",fu:CSG,pr:"E03.03.02 Evaluación del Desempeño y Mejora Continua",fa:"",rq:"9.1.1",fr:"22/10/2026",de:"Disponer de un instrumento consolidado de seguimiento de AC y OM que muestre el estado del conjunto y no de cada expediente por separado.",ca:"El seguimiento se realizaba expediente por expediente, sin vista del conjunto ni identificación de causas repetidas.",cr:"La matriz consolidada muestra en una consulta el estado de expedientes y acciones, agrupa por familia de causa y registra la disposición de cada hallazgo de la auditoría 001-2025.",es:"Abierta - plan de acción en ejecución",ve:"Parcial - acciones implementadas y acciones pendientes",ef:"Pendiente - evaluación programada",pe:"Cierre del 2026-II",ci:"",ac:[["Elaborar el FI-GCA-FR-008 Matriz de seguimiento de AC y OM.",SUB,"19/10/2026","19/10/2026",I],["Incorporar a la matriz la agrupación por familia de causa.",SUB,"19/10/2026","19/10/2026",I],["Registrar la disposición de las observaciones y OM de la auditoría 001-2025 sin expediente.",SUB,"26/10/2026","",N]]}
+];
+
+/* ═══════════ utilidades ═══════════ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const decoder=document.createElement("textarea");
+function plain(v){ if(v==null)return ""; if(Array.isArray(v))v=v.join(", "); v=String(v);
+  v=v.replace(/<br\s*\/?>/gi,"\n").replace(/<\/p>\s*<p[^>]*>/gi,"\n").replace(/<[^>]+>/g,"");
+  decoder.innerHTML=v; v=decoder.value.replace(/ /g," ");
+  return v.split("\n").map(s=>s.trimEnd()).join("\n").trim();}
+function pd(s){ if(!s)return null; const m=String(s).match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/); if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  const m2=String(s).match(/(\d{4})-(\d{2})-(\d{2})/); return m2?new Date(+m2[1],+m2[2]-1,+m2[3]):null;}
+const two=n=>String(n).padStart(2,"0");
+const fmt=s=>{const d=pd(s);return d?`${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`:""};
+const toISO=s=>{const d=pd(s);return d?`${d.getFullYear()}-${two(d.getMonth()+1)}-${two(d.getDate())}`:""};
+const toQ=iso=>{const d=pd(iso);return d?`${two(d.getDate())}-${two(d.getMonth()+1)}-${d.getFullYear()}`:""};
+const HOY=(()=>{const d=new Date();d.setHours(0,0,0,0);return d})();
+const isSel=v=>v&&v!=="Seleccione";
+function toast(msg,err){const t=$("#toast");t.textContent=msg;t.className="toast"+(err?" err":"");t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",err?7000:3500);}
+function confirmar(titulo,msg){return new Promise(res=>{$("#cT").textContent=titulo;$("#cM").textContent=msg;const d=$("#dConf");
+  $("#cSi").onclick=()=>{d.close();res(true)};$("#cNo").onclick=()=>{d.close();res(false)};d.showModal();});}
+
+/* ═══════════ estado ═══════════ */
+let RECS=[], MODO="demo", SES=null;
+let FL={t:"",e:"",f:"",q:"",arch:false};
+try{SES=JSON.parse(sessionStorage.getItem("acom-ses")||"null")}catch(e){}
+const proxy=(()=>{try{return new URLSearchParams(location.search).get("proxy")||PROXY_URL}catch(e){return PROXY_URL}})();
+
+const tipoDe=r=>(r.v.tipo==="Oportunidad de mejora"||/^OM/i.test(r.v.codigo))?"OM":"AC";
+const famDe=r=>{const m=(r.v.familia||"").match(/^F\d/);return m?m[0]:""};
+const vig=r=>r.v.situacion!=="Archivado";
+const desc=r=>tipoDe(r)==="OM"?(r.v.descOM||r.v.descNC):(r.v.descNC||r.v.descOM);
+const estColor=e=>(EST.find(x=>x[0]===e)||[0,"var(--gray)"])[1];
+const estShort=e=>(EST.find(x=>x[0]===e)||[0,0,e||"Sin estado"])[2];
+const actColor={[I]:"var(--ok)",[P]:"var(--wait)",[N]:"var(--gray)"};
+const actEst=a=>a.estado||N;
+
+function norm(raw){
+  const v={};Object.entries(F).forEach(([k,id])=>v[k]=plain(raw.v[id]));
+  Object.keys(v).forEach(k=>{if(v[k]==="Seleccione")v[k]=""});
+  const acts=(raw.acts||[]).map(a=>{const o={id:a.id};Object.entries(A).forEach(([k,id])=>o[k]=plain(a.v[id]));if(o.estado==="Seleccione")o.estado="";return o})
+    .sort((x,y)=>(+x.n||99)-(+y.n||99));
+  return {id:raw.id,v,acts};
+}
+function fromSnap(){
+  const fu={"Auditoría interna 001-2025":"Auditoria interna"};
+  return SNAP.map((d,i)=>({id:"snap"+i,acts:d.ac.map((a,j)=>({id:"s"+i+"_"+j,n:String(j+1),accion:a[0],resp:a[1],prog:a[2],ejec:a[3],estado:a[4],link:"",obs:""})),
+    v:Object.assign(Object.fromEntries(Object.keys(F).map(k=>[k,""])),{codigo:d.c,tipo:d.t==="AC"?"Acción correctiva":"Oportunidad de mejora",clasif:d.cl,fuente:fu[d.fu]||d.fu,proceso:d.pr,familia:d.fa?FAM[d.fa]:"",requisito:d.rq?d.rq+" de ISO 21001:2018":"",fecha:d.fr,
+      descNC:d.t==="AC"?d.de:"",descOM:d.t==="OM"?d.de:"",causa:d.t==="AC"?d.ca:"",situacionV:d.t==="OM"?d.ca:"",criterio:d.cr,estado:d.es,resVerif:d.ve,resEf:d.ef,periodo:d.pe,fCierre:d.ci,situacion:"Vigente"})}));
+}
+
+/* ═══════════ datos ═══════════ */
+async function cargar(){
+  $("#cards").innerHTML='<div class="loading">Cargando expedientes…</div>';
+  if(!proxy){usarDemo("Aún no se ha configurado la conexión con QuintaDB (falta la URL del Apps Script).");return;}
+  try{
+    const r=await fetch(proxy+(proxy.includes("?")?"&":"?")+"action=list&_="+Date.now());
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.error||"Respuesta no válida");
+    RECS=j.records.map(norm).filter(r=>r.v.codigo||desc(r));MODO="vivo";
+    const h=new Date();
+    $("#conn").className="conn on";$("#conn").innerHTML=`<i></i><span>Conectado a QuintaDB · datos leídos a las ${two(h.getHours())}:${two(h.getMinutes())}</span>`;
+    $("#banner").innerHTML="";$("#foot").textContent="Datos en tiempo real.";
+    pintar();
+  }catch(e){usarDemo("No se pudo conectar con QuintaDB ("+e.message+").");}
+}
+function usarDemo(motivo){
+  RECS=fromSnap();MODO="demo";
+  $("#conn").className="conn";$("#conn").innerHTML="<i></i><span>Sin conexión · copia de respaldo</span>";
+  $("#banner").innerHTML=`<div class="banner"><b>Está viendo una copia de respaldo del ${SNAP_FECHA}.</b> ${esc(motivo)} Mientras no haya conexión no se pueden editar ni crear expedientes.</div>`;
+  $("#foot").textContent="Copia de respaldo del "+SNAP_FECHA+".";
+  pintar();
+}
+async function post(body){
+  const r=await fetch(proxy,{method:"POST",body:JSON.stringify(Object.assign({correo:SES&&SES.correo,clave:SES&&SES.clave},body))});
+  const j=await r.json(); if(!j.ok)throw new Error(j.error||"No se pudo guardar"); return j;
+}
+
+/* ═══════════ indicadores ═══════════ */
+function kpis(){
+  const V=RECS.filter(vig);const acts=V.flatMap(d=>d.acts);const imp=acts.filter(a=>actEst(a)===I).length;
+  const ac=V.filter(d=>tipoDe(d)==="AC").length,om=V.length-ac;
+  const cer=V.filter(d=>d.v.estado==="Cerrada - eficaz").length;
+  const venc=acts.filter(a=>actEst(a)!==I&&pd(a.prog)&&pd(a.prog)<HOY).length;
+  const pct=acts.length?Math.round(imp*100/acts.length):0;const pc=V.length?Math.round(cer*100/V.length):0;
+  const k=[
+   {v:V.length,l:"Expedientes vigentes",s:`${ac} acciones correctivas · ${om} oportunidades de mejora`,
+    n:"<b>Qué mide:</b> cuántos casos se están gestionando hoy.<br><b>Cómo se calcula:</b> se cuentan todos los expedientes que no están archivados."},
+   {v:cer,c:"var(--ok)",l:"Cerrados eficaces",s:`${pc}% del total de expedientes`,
+    n:"<b>Qué mide:</b> casos en que se comprobó que el problema quedó resuelto.<br><b>Cómo se calcula:</b> expedientes «Cerrado eficaz» ÷ expedientes vigentes × 100."},
+   {v:V.length-cer,c:"var(--wait)",l:"Expedientes en curso",s:"aún con trabajo o comprobación pendiente",
+    n:"<b>Qué mide:</b> casos que todavía no se pueden dar por concluidos.<br><b>Cómo se calcula:</b> expedientes vigentes − expedientes cerrados eficaces."},
+   {v:pct+"%",l:"Avance de los planes de acción",s:`${imp} de ${acts.length} actividades realizadas`,bar:pct,
+    n:"<b>Qué mide:</b> cuánto se ha avanzado en el conjunto de actividades comprometidas.<br><b>Cómo se calcula:</b> actividades «Implementado» ÷ total de actividades × 100."},
+   {v:venc,c:venc?"var(--bad)":"var(--ok)",l:"Actividades con fecha vencida",s:venc?"requieren atención inmediata":"ninguna atrasada a la fecha",
+    n:"<b>Qué mide:</b> actividades atrasadas.<br><b>Cómo se calcula:</b> actividades no terminadas cuya fecha programada ya pasó. Lo ideal es 0."}
+  ];
+  $("#kpis").innerHTML=k.map(x=>`<div class="kpi"><div class="v" style="color:${x.c||"var(--ink)"}">${x.v}</div><div class="l">${x.l}</div><div class="s">${x.s}</div>${x.bar!=null?`<div class="track" style="margin-top:6px"><i style="width:${x.bar}%;background:var(--brand)"></i></div>`:""}<div class="n">${x.n}</div></div>`).join("");
+}
+function donut(){
+  const V=RECS.filter(vig);let acc=0,seg=[];const n=V.length||1;
+  EST.forEach(([e,c])=>{const k=V.filter(d=>d.v.estado===e).length;if(k){seg.push(`${c} ${acc/n*360}deg ${(acc+k)/n*360}deg`);acc+=k}});
+  if(acc<V.length)seg.push(`var(--gray) ${acc/n*360}deg 360deg`);
+  const el=$("#donut");el.style.background=seg.length?`conic-gradient(${seg.join(",")})`:"var(--line)";
+  el.innerHTML=`<b>${V.length}<small>expedientes</small></b>`;
+  $("#legend").innerHTML=EST.map(([e,c,s,t])=>{const k=V.filter(d=>d.v.estado===e).length;if(!k&&e==="Cerrada - no eficaz")return"";return `<button data-e="${esc(e)}" class="${FL.e===e?"on":""}" title="${esc(t)}"><span class="dot" style="background:${c}"></span><span>${s}</span><strong style="margin-left:auto">${k}</strong></button>`}).join("");
+  document.querySelectorAll("#legend button").forEach(x=>x.onclick=()=>{FL.e=FL.e===x.dataset.e?"":x.dataset.e;$("#fEst").value=FL.e;pintar()});
+}
+function fam(){
+  const ac=RECS.filter(d=>vig(d)&&tipoDe(d)==="AC");const mx=Math.max(1,...Object.keys(FAM).map(f=>ac.filter(d=>famDe(d)===f).length));
+  $("#fam").innerHTML=Object.entries(FAM).map(([f,l])=>{
+    const g=ac.filter(d=>famDe(d)===f);const c=g.filter(d=>d.v.estado==="Cerrada - eficaz").length;
+    return `<div class="bar ${FL.f===f?"on":""}" data-f="${f}"><div class="t"><span>${l}</span><strong>${g.length}</strong></div><div class="track" style="width:${Math.max(4,g.length/mx*100)}%">${g.length?`<i style="width:${c/g.length*100}%;background:var(--ok)"></i><i style="flex:1;background:var(--wait)"></i>`:""}</div></div>`}).join("");
+  document.querySelectorAll("#fam .bar").forEach(x=>x.onclick=()=>{FL.f=FL.f===x.dataset.f?"":x.dataset.f;$("#fFam").value=FL.f;pintar()});
+}
+function timeline(){
+  const it=[];RECS.filter(vig).forEach(d=>d.acts.forEach(a=>{const dt=pd(a.prog);if(actEst(a)!==I&&dt)it.push({d,a,dt})}));
+  it.sort((x,y)=>x.dt-y.dt);
+  $("#tl").innerHTML=it.map(({d,a,dt})=>`<div class="it" data-id="${esc(d.id)}" tabindex="0"><div><div class="date mono ${dt<HOY?"late":""}">${fmt(a.prog)}</div><div class="meta">${dt<HOY?"Vencida":esc(actEst(a))}</div></div><div><span class="code">${esc(d.v.codigo)}</span> · ${esc(a.accion)}<div class="meta">${esc(a.resp)}</div></div></div>`).join("")||'<div class="empty">No hay actividades pendientes con fecha.</div>';
+  document.querySelectorAll("#tl .it").forEach(x=>x.onclick=()=>verDetalle(x.dataset.id));
+}
+
+/* ═══════════ tarjetas ═══════════ */
+function filtrados(){
+  return RECS.filter(d=>(FL.arch||vig(d))&&(!FL.t||tipoDe(d)===FL.t)&&(!FL.e||d.v.estado===FL.e)&&(!FL.f||famDe(d)===FL.f)&&(!FL.q||JSON.stringify(d).toLowerCase().includes(FL.q)))
+   .sort((a,b)=>tipoDe(a).localeCompare(tipoDe(b))||((pd(b.v.fecha)||0)-(pd(a.v.fecha)||0))||a.v.codigo.localeCompare(b.v.codigo));
+}
+function tarjetas(){
+  const L=filtrados();
+  $("#count").textContent=`Mostrando ${L.length} expediente${L.length===1?"":"s"}`+(FL.t||FL.e||FL.f||FL.q?" (con filtros)":"");
+  $("#cards").innerHTML=L.map(d=>{
+    const n=d.acts.length,i=d.acts.filter(a=>actEst(a)===I).length,p=d.acts.filter(a=>actEst(a)===P).length;const t=tipoDe(d);
+    return `<article class="card ${vig(d)?"":"arch"}" style="border-top-color:${estColor(d.v.estado)}">
+      <div class="h"><span class="code">${esc(d.v.codigo||"(sin código)")}</span>${vig(d)?`<span class="tag ${t}">${t==="AC"?esc(d.v.clasif||"Acción correctiva"):"Oportunidad de mejora"}</span>`:'<span class="tag ARCH">Archivado</span>'}</div>
+      <div class="meta">${esc(d.v.proceso)}${d.v.requisito?" · ISO "+esc(d.v.requisito.replace(/ de ISO 21001:2018/,"")):""}</div>
+      <div class="d">${esc(desc(d))}</div>
+      <div class="st"><span class="dot" style="background:${estColor(d.v.estado)}"></span>${esc(estShort(d.v.estado))}</div>
+      <div class="prog">${n?`<div class="track"><i style="width:${i/n*100}%;background:var(--ok)"></i><i style="width:${p/n*100}%;background:var(--wait)"></i></div>${i} de ${n} actividades hechas`:"Sin plan de acción registrado"}</div>
+      <div class="cbtns"><button class="btn" data-ver="${esc(d.id)}">Ver detalle</button>${vig(d)?`<button class="btn" data-ed="${esc(d.id)}">Editar</button>`:""}</div>
+    </article>`}).join("")||'<div class="empty">No hay expedientes con esos filtros.</div>';
+  document.querySelectorAll("[data-ver]").forEach(b=>b.onclick=()=>verDetalle(b.dataset.ver));
+  document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>editar(b.dataset.ed));
+}
+function pintar(){kpis();donut();fam();timeline();tarjetas();}
+
+/* ═══════════ detalle ═══════════ */
+function verDetalle(id){
+  const d=RECS.find(x=>x.id===id);if(!d)return;const t=tipoDe(d);const v=d.v;
+  const es=v.estado||"";const stage=es==="Cerrada - eficaz"||es==="Cerrada - no eficaz"?5:es.startsWith("Acciones implementadas")?3:es.includes("ejecución")?2:1;
+  const lbl=["Registro","Plan de acción","Ejecución","Eficacia","Cierre"];
+  const blk=(h,x)=>x?`<h3>${h}</h3><p>${esc(x)}</p>`:"";
+  const kv=pairs=>`<div class="kv">${pairs.filter(p=>p[1]).map(p=>`<div><span>${p[0]}</span>${esc(p[1])}</div>`).join("")}</div>`;
+  $("#mh").innerHTML=`<div><span class="tag ${t}">${t==="AC"?"Acción correctiva":"Oportunidad de mejora"}</span><h2 class="mono">${esc(v.codigo)}</h2><div class="meta">${esc(v.proceso)}${v.clasif?" · "+esc(v.clasif):""}</div>
+    <div class="steps">${lbl.map((l,i)=>`<div class="${i<stage?"done":i===stage?"cur":""}">${l}</div>`).join("")}</div></div><button class="x" data-close aria-label="Cerrar">×</button>`;
+  $("#mb").innerHTML=kv([["Fuente",v.fuente],["Requisito de la norma",v.requisito],["Fecha de registro",fmt(v.fecha)],["Tipo de causa",v.familia],["Detectado por",v.generado],["Aceptado por",v.aceptado]])+
+    (t==="AC"?blk("Qué se encontró (no conformidad)",v.descNC)+blk("Corrección inmediata",v.correccion)+blk("Análisis de la causa raíz"+(v.metodo?" · "+v.metodo:""),v.analisis)+blk("Causa raíz determinada",v.causa)
+             :blk("Qué se busca mejorar",v.descOM)+blk("Situación que la sustenta",v.situacionV))+
+    `<h3>Plan de acción</h3>`+(d.acts.length?`<table><thead><tr><th>N.°</th><th>Actividad</th><th>Responsable</th><th>Fecha programada</th><th>Fecha realizada</th><th>Estado</th></tr></thead><tbody>
+    ${d.acts.map((a,i)=>{const dt=pd(a.prog);return `<tr><td>${esc(a.n||i+1)}</td><td>${esc(a.accion)}${a.link?`<div><a href="${esc(a.link)}" target="_blank" rel="noopener">Ver evidencia</a></div>`:""}</td><td>${esc(a.resp)}</td><td class="mono ${actEst(a)!==I&&dt&&dt<HOY?"late":""}">${fmt(a.prog)||"—"}</td><td class="mono">${fmt(a.ejec)||"—"}</td><td><span class="st"><span class="dot" style="background:${actColor[actEst(a)]||"var(--gray)"}"></span>${esc(actEst(a))}</span></td></tr>`}).join("")}</tbody></table>`:"<p class='meta'>Sin actividades registradas.</p>")+
+    blk("Cómo se comprobará que funcionó (criterio de eficacia)",v.criterio)+
+    `<h3>Verificación, eficacia y cierre</h3>`+kv([["Resultado de la verificación",v.resVerif],["Fecha de verificación",fmt(v.fVerif)],["Resultado de la eficacia",v.resEf],["Periodo de evaluación",v.periodo],["Fecha programada de evaluación",fmt(v.fProgEf)],["Estado del expediente",v.estado],["Fecha de cierre",fmt(v.fCierre)],["Expediente actualizado al",fmt(v.actualizado)]])+
+    blk("Evidencia revisada",v.evRev||v.evPrev)+blk("Observaciones",[v.obsVerif,v.obsEf,v.obsCierre].filter(Boolean).join("\n\n"));
+  $("#mf").innerHTML=vig(d)?`<button class="btn dan" id="dArch">Archivar</button><button class="btn" data-close>Cerrar</button><button class="btn pri" id="dEd">Editar</button>`
+                           :`<button class="btn" id="dRest">Restaurar como vigente</button><button class="btn" data-close>Cerrar</button>`;
+  const dlg=$("#dlg");
+  $("#dEd")&&($("#dEd").onclick=()=>{dlg.close();editar(id)});
+  $("#dArch")&&($("#dArch").onclick=()=>archivar(d,false));
+  $("#dRest")&&($("#dRest").onclick=()=>archivar(d,true));
+  dlg.showModal();
+}
+
+/* ═══════════ edición ═══════════ */
+const SECS=[
+ {t:"1. Datos generales",i:"Identifican el expediente. El código sigue la numeración del año.",f:[
+  {k:"tipo",l:"Tipo de expediente",ty:"sel",o:"tipo",req:1,h:"Acción correctiva: hubo un incumplimiento. Oportunidad de mejora: no hubo incumplimiento, pero se puede mejorar."},
+  {k:"codigo",l:"Código",req:1,h:"Ejemplo: AC N°04-2026 u OM N°08/2026. Se propone el siguiente número disponible."},
+  {k:"fecha",l:"Fecha de registro",ty:"date",h:"Día en que se identificó o registró el hallazgo."},
+  {k:"fuente",l:"Origen del hallazgo",ty:"sel",o:"fuente",h:"Dónde se detectó: auditoría, revisión por la dirección, Comité SGOE, quejas, etc."},
+  {k:"clasif",l:"Clasificación",ty:"sel",o:"clasif",h:"No conformidad: incumple un requisito. Menor: incumplimiento puntual que no afecta al sistema completo."},
+  {k:"requisito",l:"Requisito de la norma",h:"Numeral de la ISO 21001 relacionado. Ejemplo: 7.5.3 de ISO 21001:2018."},
+  {k:"proceso",l:"Proceso involucrado",full:1,h:"Nombre del proceso donde ocurre el hallazgo, tal como figura en el inventario de procesos."},
+  {k:"familia",l:"Tipo de causa",ty:"sel",o:"familia",only:"AC",h:"Agrupa hallazgos con causas parecidas para detectar problemas que se repiten."},
+  {k:"generado",l:"Detectado por",h:"Persona o instancia que identificó el hallazgo (auditor, Comité SGOE…)."},
+  {k:"aceptado",l:"Aceptado por",h:"Responsable que acepta el hallazgo y se compromete a atenderlo."}]},
+ {t:"2. Descripción del hallazgo",i:"Explique con hechos concretos y verificables qué se encontró.",f:[
+  {k:"descNC",l:"Qué se encontró (no conformidad)",ty:"area",full:1,req:1,only:"AC",h:"Describa el incumplimiento: qué, dónde y cuándo. Evite opiniones; indique la evidencia."},
+  {k:"descOM",l:"Qué se busca mejorar (objetivo)",ty:"area",full:1,req:1,only:"OM",h:"Describa la mejora que se quiere lograr."},
+  {k:"situacionV",l:"Situación verificada que la sustenta",ty:"area",full:1,only:"OM",h:"Hechos que muestran por qué conviene esta mejora."},
+  {k:"reqCorr",l:"¿Requiere corrección inmediata?",ty:"sel",o:"siNo",only:"AC",h:"La corrección «apaga el incendio» mientras se ataca la causa. Si no aplica, indique «No aplica»."},
+  {k:"fCorr",l:"Fecha de la corrección",ty:"date",only:"AC",h:"Día en que se realizó la corrección inmediata."},
+  {k:"correccion",l:"Corrección realizada",ty:"area",full:1,only:"AC",h:"Qué se hizo de inmediato para contener el problema."}]},
+ {t:"3. Análisis de la causa raíz",i:"Solo para acciones correctivas: se busca el porqué de fondo, no el síntoma.",only:"AC",f:[
+  {k:"metodo",l:"Método aplicado",h:"Por ejemplo: 5 Porqués, Ishikawa."},
+  {k:"analisis",l:"Desarrollo del análisis",ty:"area",full:1,rows:7,h:"Escriba cada pregunta y su respuesta en una línea. Ejemplo: «1. ¿Por qué…? Porque…»."},
+  {k:"causa",l:"Causa raíz determinada",ty:"area",full:1,h:"La causa de fondo que, si se elimina, evita que el problema vuelva a ocurrir."}]},
+ {t:"4. Plan de acción",i:"Actividades concretas para eliminar la causa o lograr la mejora. Cada una con responsable y fecha.",acts:1},
+ {t:"5. Verificación y eficacia",i:"Primero se verifica que las actividades se hicieron; luego, que realmente resolvieron el problema.",f:[
+  {k:"criterio",l:"Cómo se comprobará que funcionó (criterio de eficacia)",ty:"area",full:1,h:"Describa qué evidencia demostrará que el problema no se repite o que la mejora se logró."},
+  {k:"evRev",l:"Evidencia revisada",ty:"area",full:1,h:"Documentos o registros con los que se comprobó."},
+  {k:"evPrev",l:"Evidencia prevista",ty:"area",full:1,only:"OM",h:"Documentos o registros que se espera obtener."},
+  {k:"fVerif",l:"Fecha de verificación",ty:"date",h:"Día en que se comprobó la ejecución de las actividades."},
+  {k:"respVerif",l:"Responsable de la verificación",h:"Quién comprobó (normalmente el Comité SGOE)."},
+  {k:"resVerif",l:"Resultado de la verificación",ty:"sel",o:"resVerif",h:"¿Se ejecutaron las actividades del plan?"},
+  {k:"obsVerif",l:"Observaciones de la verificación",ty:"area",full:1,h:"Cambios al plan, hallazgos relacionados u otras precisiones."},
+  {k:"periodo",l:"Periodo de evaluación de la eficacia",h:"Ejemplo: cierre del 2026-II, primer trimestre de 2027."},
+  {k:"fProgEf",l:"Fecha programada de evaluación",ty:"date",h:"Cuándo se evaluará si la acción fue eficaz."},
+  {k:"fRealEf",l:"Fecha real de evaluación",ty:"date",h:"Cuándo se evaluó efectivamente."},
+  {k:"resEf",l:"Resultado de la eficacia",ty:"sel",o:"resEf",h:"Eficaz: el problema no se repitió o la mejora se logró."},
+  {k:"obsEf",l:"Observaciones de la eficacia",ty:"area",full:1,h:"Justificación del resultado o del plazo de evaluación."}]},
+ {t:"6. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada.",f:[
+  {k:"estado",l:"Estado del expediente",ty:"sel",o:"estado",req:1,h:"Etapa en que se encuentra. Determina el color de la tarjeta y los indicadores."},
+  {k:"fCierre",l:"Fecha de cierre",ty:"date",h:"Solo cuando el expediente se cierra."},
+  {k:"respCierre",l:"Responsable del cierre",h:"Quién da conformidad al cierre."},
+  {k:"resCierre",l:"Resultado del cierre",ty:"sel",o:"resCierre",h:"Conforme si todas las acciones se implementaron."},
+  {k:"obsCierre",l:"Observaciones del cierre",ty:"area",full:1,h:"Notas para la revisión por la dirección u otras precisiones."}]}
+];
+let EDIT=null;
+function sigCodigo(tipo){
+  const y=new Date().getFullYear();const pre=tipo==="Oportunidad de mejora"?"OM":"AC";
+  const nums=RECS.map(r=>r.v.codigo||"").filter(c=>c.startsWith(pre)&&c.includes(String(y))).map(c=>+((c.match(/N°\s*(\d+)/)||[])[1]||0));
+  const n=two(Math.max(0,...nums)+1);return pre==="OM"?`OM N°${n}/${y}`:`AC N°${n}-${y}`;
+}
+function campo(fd,v){
+  const id="e_"+fd.k,val=v[fd.k]||"";let inp;
+  if(fd.ty==="sel")inp=`<select id="${id}" name="${fd.k}"${fd.req?" required":""}><option value="">— Seleccione —</option>${OPT[fd.o].map(o=>`<option${o===val?" selected":""}>${esc(o)}</option>`).join("")}${val&&!OPT[fd.o].includes(val)?`<option selected>${esc(val)}</option>`:""}</select>`;
+  else if(fd.ty==="area")inp=`<textarea id="${id}" name="${fd.k}" rows="${fd.rows||3}"${fd.req?" required":""}>${esc(val)}</textarea>`;
+  else if(fd.ty==="date")inp=`<input type="date" id="${id}" name="${fd.k}" value="${toISO(val)}">`;
+  else inp=`<input id="${id}" name="${fd.k}" value="${esc(val)}"${fd.req?" required":""}>`;
+  return `<div class="fi${fd.full?" full":""}" data-only="${fd.only||""}"><label for="${id}">${fd.l}${fd.req?' <span class="req">*</span>':""}</label>${fd.h?`<div class="hl">${fd.h}</div>`:""}${inp}</div>`;
+}
+function actHTML(a,i){
+  return `<div class="act" data-aid="${esc(a.id||"")}"><div class="ah"><span>Actividad ${i+1}</span><button type="button" class="btn dan" data-rm>Quitar</button></div>
+   <div class="fg">
+    <div class="fi full"><label>Qué se hará <span class="req">*</span></label><textarea data-a="accion" rows="2" required>${esc(a.accion)}</textarea></div>
+    <div class="fi"><label>Responsable</label><input data-a="resp" value="${esc(a.resp)}"></div>
+    <div class="fi"><label>Estado</label><select data-a="estado">${OPT.actEstado.map(o=>`<option${o===(a.estado||N)?" selected":""}>${o}</option>`).join("")}</select></div>
+    <div class="fi"><label>Fecha programada</label><input type="date" data-a="prog" value="${toISO(a.prog)}"></div>
+    <div class="fi"><label>Fecha en que se realizó</label><input type="date" data-a="ejec" value="${toISO(a.ejec)}"></div>
+    <div class="fi full"><label>Enlace a la evidencia (opcional)</label><input type="url" data-a="link" value="${esc(a.link)}" placeholder="https://…"></div>
+   </div></div>`;
+}
+function editar(id){
+  if(MODO!=="vivo"){toast("Sin conexión con QuintaDB: no se puede editar en la copia de respaldo.",1);return;}
+  if(!SES){pedirLogin(()=>editar(id));return;}
+  const d=id?RECS.find(x=>x.id===id):null;
+  const v=d?Object.assign({},d.v):Object.assign(Object.fromEntries(Object.keys(F).map(k=>[k,""])),{tipo:"Acción correctiva",estado:"Abierta - plan de acción por aprobar",fecha:toQ(toISO(new Date().toISOString().slice(0,10))),metodo:"5 Porqués"});
+  if(!d)v.codigo=sigCodigo(v.tipo);
+  EDIT={id:d?d.id:null,orig:d?d.acts.map(a=>a.id):[]};
+  $("#eh").innerHTML=`<div><h2>${d?"Editar "+esc(v.codigo):"Nuevo expediente"}</h2><div class="meta">Los campos con <span class="late">*</span> son obligatorios. Los cambios se guardan directamente en QuintaDB.</div></div><button type="button" class="x" id="eX" aria-label="Cerrar">×</button>`;
+  $("#eb").innerHTML=SECS.map(s=>`<fieldset class="sec" data-only="${s.only||""}"><legend>${s.t}</legend><div class="si">${s.i}</div>${s.acts?`<div id="acts">${(d?d.acts:[{}]).map(actHTML).join("")}</div><button type="button" class="btn" id="addAct">＋ Añadir actividad</button>`:`<div class="fg">${s.f.map(fd=>campo(fd,v)).join("")}</div>`}</fieldset>`).join("");
+  const tipoSel=$("#e_tipo");
+  const aplicarTipo=()=>{const t=tipoSel.value==="Oportunidad de mejora"?"OM":"AC";
+    document.querySelectorAll("#eb [data-only]").forEach(el=>{const o=el.dataset.only;const show=!o||o===t;el.style.display=show?"":"none";
+      el.querySelectorAll("[required]").forEach(x=>x.disabled=!show);el.querySelectorAll("input,select,textarea").forEach(x=>{if(!show)x.dataset.hidden="1";else delete x.dataset.hidden})});
+    if(t==="OM"&&!$("#e_clasif").value)$("#e_clasif").value="Oportunidad de mejora";};
+  tipoSel.onchange=()=>{if(!EDIT.id)$("#e_codigo").value=sigCodigo(tipoSel.value);aplicarTipo();};
+  aplicarTipo();
+  const renum=()=>document.querySelectorAll("#acts .act .ah span").forEach((s,i)=>s.textContent="Actividad "+(i+1));
+  $("#addAct").onclick=()=>{$("#acts").insertAdjacentHTML("beforeend",actHTML({},$("#acts").children.length));renum();$("#acts").lastElementChild.querySelector("textarea").focus();};
+  $("#acts").onclick=e=>{if(e.target.matches("[data-rm]")){e.target.closest(".act").remove();renum();}};
+  $("#eX").onclick=$("#eCancel").onclick=()=>$("#dEdit").close();
+  $("#dEdit").showModal();
+}
+$("#fEdit").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const tipo=$("#e_tipo").value;const values={};
+  SECS.forEach(s=>(s.f||[]).forEach(fd=>{const el=$("#e_"+fd.k);if(!el||el.dataset.hidden)return;let val=el.value.trim();
+    if(fd.ty==="date")val=toQ(val);else if(fd.ty==="area")val=esc(val).replace(/\n/g,"<br />");values[F[fd.k]]=val;}));
+  if(!values[F.reqAnalisis]&&tipo==="Oportunidad de mejora")values[F.reqAnalisis]="No aplica";
+  const acts=[...document.querySelectorAll("#acts .act")].map((el,i)=>{const o={};el.querySelectorAll("[data-a]").forEach(x=>{let val=x.value.trim();if(x.type==="date")val=toQ(val);else if(x.tagName==="TEXTAREA")val=esc(val).replace(/\n/g,"<br />");o[A[x.dataset.a]]=val});o[A.n]=String(i+1);return {id:el.dataset.aid||null,v:o}});
+  const keep=acts.map(a=>a.id).filter(Boolean);const removed=EDIT.orig.filter(id=>!keep.includes(id));
+  const btn=$("#eSave");btn.disabled=true;btn.textContent="Guardando…";
+  try{await post({action:"save",id:EDIT.id,values,acts,removed});$("#dEdit").close();toast("Expediente guardado en QuintaDB.");await cargar();}
+  catch(err){toast("No se guardó: "+err.message,1);if(/clave|autorizado/i.test(err.message)){SES=null;try{sessionStorage.removeItem("acom-ses")}catch(x){};sesion();}}
+  finally{btn.disabled=false;btn.textContent="Guardar en QuintaDB";}
+});
+async function archivar(d,restaurar){
+  if(MODO!=="vivo"){toast("Sin conexión con QuintaDB.",1);return;}
+  if(!SES){pedirLogin(()=>archivar(d,restaurar));return;}
+  const ok=await confirmar(restaurar?"Restaurar expediente":"Archivar expediente",restaurar?`${d.v.codigo} volverá a la lista de expedientes vigentes.`:`${d.v.codigo} dejará de contarse en los indicadores, pero se conserva y puede restaurarse cuando quiera.`);
+  if(!ok)return;
+  try{await post({action:"archive",id:d.id,restaurar});$("#dlg").close();toast(restaurar?"Expediente restaurado.":"Expediente archivado.");await cargar();}catch(err){toast(err.message,1)}
+}
+
+/* ═══════════ sesión ═══════════ */
+let trasLogin=null;
+function pedirLogin(cb){trasLogin=cb||null;$("#lErr").textContent="";$("#dLogin").showModal();$("#lCorreo").focus();}
+function sesion(){$("#bLogin").textContent=SES?"Salir ("+SES.correo.split("@")[0]+")":"Ingresar para editar";}
+$("#fLogin").addEventListener("submit",async e=>{
+  e.preventDefault();if(MODO!=="vivo"){$("#lErr").textContent="No hay conexión con QuintaDB.";return;}
+  const c={correo:$("#lCorreo").value.trim(),clave:$("#lClave").value};$("#lBtn").disabled=true;
+  try{const r=await fetch(proxy,{method:"POST",body:JSON.stringify(Object.assign({action:"login"},c))});const j=await r.json();if(!j.ok)throw new Error(j.error);
+    SES=c;try{sessionStorage.setItem("acom-ses",JSON.stringify(c))}catch(x){};sesion();$("#dLogin").close();toast("Ingresó correctamente. Ya puede editar.");if(trasLogin){const f=trasLogin;trasLogin=null;f();}}
+  catch(err){$("#lErr").textContent=err.message||"No se pudo ingresar.";}finally{$("#lBtn").disabled=false;}
+});
+$("#bLogin").onclick=()=>{if(SES){SES=null;try{sessionStorage.removeItem("acom-ses")}catch(x){};sesion();toast("Sesión de edición cerrada.");}else pedirLogin();};
+
+/* ═══════════ eventos generales ═══════════ */
+document.addEventListener("click",e=>{if(e.target.matches("[data-close]"))e.target.closest("dialog").close();});
+document.querySelectorAll("dialog").forEach(d=>d.addEventListener("click",e=>{if(e.target===d&&d.id!=="dEdit")d.close()}));
+$("#bNuevo").onclick=()=>editar(null);
+$("#bReload").onclick=()=>cargar();
+$("#bTheme").onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark";try{localStorage.setItem("acom-theme",r.dataset.theme)}catch(e){}};
+try{const t=localStorage.getItem("acom-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+EST.forEach(([e,,l])=>$("#fEst").insertAdjacentHTML("beforeend",`<option value="${esc(e)}">${l}</option>`));
+Object.entries(FAM).forEach(([k,l])=>$("#fFam").insertAdjacentHTML("beforeend",`<option value="${k}">${l}</option>`));
+$("#fEst").onchange=e=>{FL.e=e.target.value;pintar()};$("#fFam").onchange=e=>{FL.f=e.target.value;pintar()};
+$("#q").oninput=e=>{FL.q=e.target.value.toLowerCase();tarjetas()};
+$("#fArch").onchange=e=>{FL.arch=e.target.checked;tarjetas()};
+document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));b.classList.add("on");FL.t=b.dataset.t;tarjetas()});
+sesion();cargar();
+</script>
+</body>
+</html>
