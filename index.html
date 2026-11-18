@@ -116,6 +116,7 @@ header nav .tab small{font-weight:700;font-size:12px;margin-left:6px;color:#ffe0
 .admsec .tools input{width:auto;flex:1;min-width:200px}
 .tw{overflow-x:auto}
 .tw table{min-width:640px}
+.roles td.si{color:var(--ok);font-weight:700;font-size:16px}.roles td.no{color:var(--bad);font-weight:700;font-size:16px}.roles td,.roles th{padding:10px 8px}
 .badge{display:inline-block;font-size:12.5px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--brand-l);color:var(--brand-d);white-space:nowrap}
 .badge.off{background:#fde8e8;color:#a61b1b}.badge.warn{background:#fff1d6;color:#8a5200}.badge.fix{background:var(--pine);color:#fff}
 .resp{display:flex;gap:10px;flex-wrap:wrap}
@@ -216,7 +217,7 @@ footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
     <nav role="tablist" aria-label="Secciones">
       <button class="tab on" role="tab" data-v="vExp" aria-selected="true">Expedientes</button>
       <button class="tab" role="tab" data-v="vInd" aria-selected="false">Indicadores y fechas<small id="tabAviso"></small></button>
-      <button class="tab" role="tab" data-v="vAdm" aria-selected="false" id="tabAdm" hidden>Administración</button>
+      <button class="tab" role="tab" data-v="vAdm" aria-selected="false" id="tabAdm">Administración<small id="tabAdmLock"> 🔒</small></button>
     </nav>
   </div>
 </header>
@@ -295,6 +296,7 @@ footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
     <div class="urpbox" id="urpAdm"></div>
     <p class="admnote"><b>Módulo de administración.</b> Solo lo ven los administradores: Patrick Villanueva y Patricia Vega, que son administradores fijos y no se pueden desactivar. Aquí se da o se quita el acceso para editar, se revisa quién hizo cada cambio y se descargan respaldos. Nada de lo que se hace aquí borra expedientes.</p>
     <div class="admnav">
+      <button class="btn" data-go="aRoles">Roles y permisos</button>
       <button class="btn" data-go="aUsr">Usuarios</button>
       <button class="btn" data-go="aLog">Bitácora de cambios</button>
       <button class="btn" data-go="aArch">Expedientes archivados</button>
@@ -302,10 +304,20 @@ footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
       <button class="btn" data-go="aClave">Mi clave</button>
     </div>
 
+    <section class="admsec" id="aRoles">
+      <h2>Roles y permisos</h2>
+      <p class="pn">Qué puede hacer cada persona en el aplicativo. El rol se asigna en «Usuarios», aquí abajo.</p>
+      <div class="tw"><table class="roles"><thead><tr><th>Rol</th><th>Ver expedientes e indicadores</th><th>Crear y editar expedientes</th><th>Archivar y restaurar</th><th>Usuarios, bitácora y respaldos</th></tr></thead><tbody>
+        <tr><td><b>Administrador</b><br><span class="meta">Control total. Patrick Villanueva y Patricia Vega son fijos.</span></td><td class="si">✓ Todos</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td></tr>
+        <tr><td><b>Editor</b><br><span class="meta">Responsables que registran y actualizan expedientes.</span></td><td class="si">✓ Todos</td><td class="si">✓</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td><b>Consulta</b><br><span class="meta">Cualquier persona, sin ingresar.</span></td><td class="si">✓ Todos</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+      </tbody></table></div>
+    </section>
+
     <section class="admsec" id="aUsr">
       <h2>Usuarios con permiso para editar</h2>
       <p class="pn">Cualquier persona puede consultar el aplicativo sin ingresar. Para crear o editar expedientes hay que estar en esta lista, activo y con clave. Los <b>editores</b> crean y editan expedientes; solo los <b>administradores</b> archivan, restauran y gestionan usuarios. Para quitar el acceso a alguien, márquelo como «Inactivo»: su historial se conserva.</p>
-      <div class="tools"><button class="btn pri" id="uNuevo">＋ Agregar usuario</button><button class="btn" id="uRecargar">↻ Volver a leer</button></div>
+      <div class="tools"><button class="btn pri" id="uNuevo">＋ Agregar usuario</button><button class="btn" id="uRecargar">↻ Volver a leer</button><button class="btn" id="uCsv">⬇ Descargar lista (Excel)</button></div>
       <div class="tw" id="uTabla"><div class="empty">Ingrese como administrador para ver los usuarios.</div></div>
     </section>
 
@@ -345,6 +357,7 @@ footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
 <dialog id="dLogin" class="sm"><form id="fLogin" method="dialog">
   <div class="mh"><div><h2>Ingresar para editar</h2><div class="meta">Solo para usuarios registrados por los administradores. Para consultar no necesita ingresar.</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
   <div class="mb">
+    <p id="lInfo" class="admnote" style="margin:0 0 12px" hidden><b>Módulo de administración.</b> Ingrese con su correo y clave de administrador para entrar.</p>
     <div class="fi" style="margin-bottom:12px"><label for="lCorreo">Correo institucional</label><input id="lCorreo" type="email" autocomplete="email" required placeholder="nombre@urp.edu.pe"></div>
     <div class="fi"><label for="lClave">Su clave</label><div class="hl">La entrega un administrador. Puede cambiarla después en «Administración › Mi clave» si es administrador, o pedir que se la cambien. Se recuerda solo mientras esta pestaña esté abierta.</div><input id="lClave" type="password" autocomplete="current-password" required></div>
     <p id="lErr" class="late" style="margin-top:10px"></p>
@@ -738,10 +751,10 @@ async function archivar(d,restaurar){
 
 /* ═══════════ sesión ═══════════ */
 let trasLogin=null;
-function pedirLogin(cb){trasLogin=cb||null;$("#lErr").textContent="";$("#dLogin").showModal();$("#lCorreo").focus();}
+function pedirLogin(cb){trasLogin=cb||null;if(!cb)$("#lInfo").hidden=true;$("#lErr").textContent="";$("#dLogin").showModal();$("#lCorreo").focus();}
 const esAdmin=()=>!!(SES&&SES.rol==="Administrador");
 function sesion(){$("#bLogin").textContent=SES?"Salir ("+SES.correo.split("@")[0]+(esAdmin()?", administrador":"")+")":"Ingresar para editar";
-  $("#tabAdm").hidden=!esAdmin();
+  $("#tabAdmLock").hidden=esAdmin();$("#tabAdm").title=esAdmin()?"":"Solo para administradores: pide ingresar con correo y clave";
   if(!esAdmin()&&!$("#vAdm").hidden)verVista("vExp");
   if(esAdmin())admCargar();}
 $("#fLogin").addEventListener("submit",async e=>{
@@ -824,6 +837,8 @@ function csv(nombre,cab,filas){
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv;charset=utf-8"}));a.download=nombre;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
 }
 const hoyTxt=()=>{const d=new Date();return `${d.getFullYear()}-${two(d.getMonth()+1)}-${two(d.getDate())}`};
+$("#uCsv").onclick=()=>{if(!USERS.length){toast("Todavía no se ha leído la lista de usuarios.",1);return;}
+  csv(`Usuarios_AC_OM_${hoyTxt()}.csv`,["Nombre","Correo","Cargo o unidad","Rol","Estado","Tiene clave","Último ingreso"],USERS.map(u=>[u.nombre,u.correo,u.cargo,u.rol||(u.fijo?"Administrador":"Editor"),u.estado,u.tieneClave?"Sí":"No",u.ultimo||""]));};
 $("#rExp").onclick=()=>{
   const V=RECS.filter(vig).sort((a,b)=>{const ka=claveCod(a),kb=claveCod(b);return tipoDe(a).localeCompare(tipoDe(b))||(kb.y-ka.y)||(ka.n-kb.n)});
   csv(`Expedientes_AC_OM_${hoyTxt()}.csv`,["N.° de registro","Tipo","Clasificación","Requisito ISO 21001","Proceso","Fuente","Familia de causa","Estado del expediente","Acciones","Implementadas","Pendientes","Responsable de la verificación","Fecha de verificación","Resultado de la eficacia","Fecha de cierre","Actualizado al"],
@@ -862,7 +877,11 @@ $("#fEst").onchange=e=>{FL.e=e.target.value;pintar()};$("#fFam").onchange=e=>{FL
 $("#q").oninput=e=>{FL.q=e.target.value.toLowerCase();tarjetas()};
 $("#fArch").onchange=e=>{FL.arch=e.target.checked;tarjetas()};
 document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));b.classList.add("on");FL.t=b.dataset.t;tarjetas()});
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>verVista(t.dataset.v));
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  if(t.dataset.v==="vAdm"&&!esAdmin()){
+    if(SES){toast("Su usuario es editor. El módulo de administración es solo para los administradores (Patrick Villanueva y Patricia Vega).",1);return;}
+    $("#lInfo").hidden=false;pedirLogin(()=>{if(esAdmin())verVista("vAdm");else toast("Ingresó como editor. El módulo de administración es solo para los administradores.",1);});return;}
+  verVista(t.dataset.v);});
 try{const v=sessionStorage.getItem("acom-vista");if(v)verVista(v)}catch(e){}
 sesion();cargar();
 document.addEventListener("DOMContentLoaded",urpGuias);
