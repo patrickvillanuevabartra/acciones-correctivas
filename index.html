@@ -11,7 +11,7 @@
   --brand:#0f8f5e;--brand-2:#0fa968;--brand-d:#0b6e48;--brand-l:#e6f4ee;--pine:#0b6e48;
   --bg:#f7f8fa;--card:#ffffff;--ink:#11161d;--muted:#5d6977;--slate:#3a4754;--line:#e2e6ea;--field:#ffffff;
   --shadow:0 1px 2px rgba(17,22,29,.04),0 2px 8px rgba(17,22,29,.05);
-  --ok:#0f8f5e;--run:#2459c9;--wait:#b86e00;--new:#6b3fc4;--bad:#c81e1e;--gray:#8a97a6;
+  --ok:#0f8f5e;--run:#2459c9;--wait:#b86e00;--new:#6b3fc4;--bad:#c81e1e;--gray:#8a97a6;--pend:#a0466e;
   --note-bg:#f1f7f4;--warn-bg:#fff6e5;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -61,8 +61,8 @@ header nav .tab small{font-weight:700;font-size:12px;margin-left:6px;color:#ffe0
 .sh{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:10px}
 .sh h2{margin:0;font-size:18px}
 .sh p{margin:0;color:var(--muted);font-size:14px;max-width:62ch}
-.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
-.step{position:relative;background:none;border:none;border-right:1px solid var(--line);color:var(--ink);text-align:left;padding:18px 26px 18px 20px;cursor:pointer;display:flex;flex-direction:column;gap:2px;border-top:6px solid var(--c)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.step{position:relative;background:none;border:none;border-right:1px solid var(--line);color:var(--ink);text-align:left;padding:16px 22px 16px 16px;cursor:pointer;display:flex;flex-direction:column;gap:2px;border-top:6px solid var(--c)}
 .step:last-child{border-right:none}
 .step:not(:last-child)::after{content:"";position:absolute;right:-9px;top:50%;width:16px;height:16px;background:var(--card);border-top:1px solid var(--line);border-right:1px solid var(--line);transform:translateY(-50%) rotate(45deg);z-index:1}
 .step:hover{background:var(--note-bg)}
@@ -162,7 +162,7 @@ label.chk input{width:auto}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .empty{padding:30px;text-align:center;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:12px}
 @media (max-width:1000px){.row{grid-template-columns:140px minmax(0,1fr) 170px}.row .prog{grid-column:2}.row .cbtns{grid-column:3}}
-@media (max-width:860px){.flow,.ind{grid-template-columns:repeat(2,1fr)}.step:nth-child(2){border-right:none}.step:nth-child(-n+2){border-bottom:1px solid var(--line)}.step::after{display:none}.kpi:nth-child(2){border-right:none}.kpi:nth-child(-n+2){border-bottom:1px solid var(--line)}.two{grid-template-columns:1fr}}
+@media (max-width:860px){.flow,.ind{grid-template-columns:repeat(2,1fr)}.step:nth-child(2n){border-right:none}.step:not(:last-child){border-bottom:1px solid var(--line)}.step:last-child{grid-column:1/-1;border-right:none}.step::after{display:none}.kpi:nth-child(2){border-right:none}.kpi:nth-child(-n+2){border-bottom:1px solid var(--line)}.two{grid-template-columns:1fr}}
 @media (max-width:640px){.seg{display:flex;width:100%}.chip{flex:1;padding:8px 6px}.filters select,.filters input[type=search]{width:100%;min-width:0}.row{grid-template-columns:1fr;gap:8px}.row .prog,.row .cbtns{grid-column:auto}header h1{font-size:21px}.hside{align-items:flex-start}.hbtns{justify-content:flex-start}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 dialog{border:none;border-radius:16px;padding:0;max-width:900px;width:calc(100% - 24px);background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -382,6 +382,7 @@ const A={n:"cfumkLW6HiA4kFWRRdMSkE",accion:"b9WQ14WRzlWPinW5P-yaGY",resp:"bVfSoY
 const I="Implementado",P="En proceso",N="No iniciado";
 const FAM={F1:"F1. Planificación y seguimiento del desempeño",F2:"F2. Supervisión académica a cargo del coordinador",F3:"F3. Control de la provisión externa al SGOE",F4:"F4. Información documentada y su registro",F5:"F5. Procesos del SGOE no implementados"};
 const EST=[
+ ["Abierta - pendiente de análisis de causa","var(--pend)","Falta analizar la causa","El hallazgo está registrado; el responsable debe determinar la causa y proponer el plan de actividades."],
  ["Abierta - plan de acción por aprobar","var(--new)","Plan por aprobar","El plan de actividades aún no ha sido aprobado."],
  ["Abierta - plan de acción en ejecución","var(--wait)","En ejecución","Se están realizando las actividades del plan."],
  ["Acciones implementadas - eficacia pendiente de evaluación","var(--run)","Hecho, falta comprobar","Las actividades se completaron; falta verificar que resolvieron el problema."],
@@ -535,7 +536,7 @@ function kpis(){
 }
 function flujo(){
   const V=RECS.filter(vig);
-  $("#flow").innerHTML=EST.slice(0,4).map(([e,c,s,t],i)=>{const k=V.filter(d=>d.v.estado===e).length;
+  $("#flow").innerHTML=EST.slice(0,5).map(([e,c,s,t],i)=>{const k=V.filter(d=>d.v.estado===e).length;
     return `<button class="step ${FL.e===e?"on":""}" data-e="${esc(e)}" style="--c:${c}" aria-pressed="${FL.e===e}"><span class="sn">Etapa ${i+1}</span><span class="big cond">${k}</span><span class="sl">${s}</span><span class="sd">${t}</span></button>`}).join("");
   const ne=V.filter(d=>d.v.estado==="Cerrada - no eficaz").length, sin=V.filter(d=>!EST.some(x=>x[0]===d.v.estado)).length;
   const ex=[];if(ne)ex.push(`${ne} cerrado${ne>1?"s":""} como no eficaz${ne>1?"es":""} (requiere nuevo expediente)`);if(sin)ex.push(`${sin} sin etapa registrada`);
