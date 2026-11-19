@@ -208,6 +208,33 @@ th{font-size:13px;color:var(--muted);font-weight:600}
 footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
 
 
+
+/* 5 Porqués */
+#pqBox{display:flex;flex-direction:column;gap:12px}
+.pq-urp{display:flex;gap:12px;align-items:flex-start}.pq-urp .urp-img,.pq-urp img{width:78px;height:auto;flex:0 0 auto}
+.pq-urp .urp-globo{margin:0;flex:1}.pq-tip{margin-top:8px;padding-top:8px;border-top:1px dashed #b9e2cd}
+.pq-chain{display:flex;flex-direction:column}
+.pq-step{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.pq-num{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center}
+.pq-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.pq-body label{font-size:14px;font-weight:600;color:var(--muted);margin-top:4px}
+.pq-body textarea{min-height:58px}
+.pq-h{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:15.5px}
+.pq-rm{background:none;border:1px solid #f1c4c4;color:var(--bad);border-radius:8px;padding:4px 10px;font-size:13.5px;cursor:pointer;font-family:inherit}
+.pq-rm:hover{background:#fdecea}
+.pq-auto{font-size:13px;color:var(--brand);margin-top:-2px}
+.pq-flecha{display:flex;align-items:center;gap:10px;margin:4px 0 4px 18px;padding:6px 0;font-size:13.5px;color:var(--muted);border-left:3px dashed var(--brand);padding-left:18px}
+.pq-flecha span{font-size:20px;color:var(--brand);font-weight:700;margin-left:-30px;background:var(--bg);padding:0 4px}
+.pq-acc{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pq-acc .btn[disabled]{opacity:.5;cursor:not-allowed}
+.pq-cont{font-size:13.5px;color:var(--muted)}
+.pq-flash{outline:3px solid #0fa968!important;background:#e7f5ee!important;transition:background .3s}
+.pq-det{display:flex;flex-direction:column;margin:6px 0 10px}
+.pq-dstep{display:flex;gap:12px;align-items:flex-start;background:var(--note-bg);border-radius:12px;padding:10px 12px}
+.pq-dstep .pq-num{width:32px;height:32px;font-size:16px}
+.pq-dq{font-weight:600}.pq-da{color:var(--slate);margin-top:2px}
+.pq-dfl{color:var(--brand);font-weight:700;margin:2px 0 2px 20px}
+@media (max-width:640px){.pq-urp .urp-img,.pq-urp img{width:56px}.pq-step{padding:12px;gap:10px}.pq-num{width:34px;height:34px;font-size:16px}}
 /* procesos (lista de elección múltiple del inventario) */
 .plist{border:1px solid var(--line);border-radius:12px;padding:6px 12px 10px;background:var(--card)}
 .plist .pt{font-weight:700;color:var(--brand);margin:12px 0 4px;font-size:13.5px;text-transform:uppercase;letter-spacing:.03em}
@@ -647,7 +674,7 @@ function verDetalle(id){
   $("#mh").innerHTML=`<div><span class="tag ${t}">${t==="AC"?"Acción correctiva":"Oportunidad de mejora"}</span><h2 class="mono">${esc(v.codigo)}</h2><div class="meta">${esc(procCorto(v.proceso))}${v.clasif?" · "+esc(v.clasif):""}</div>
     <div class="steps">${lbl.map((l,i)=>`<div class="${i<stage?"done":i===stage?"cur":""}">${l}</div>`).join("")}</div></div><button class="x" data-close aria-label="Cerrar">×</button>`;
   $("#mb").innerHTML=procDetalle(v.proceso)+(v.provext?`<div class="procdet"><span>Proveedor(es) externo(s) involucrado(s) · FI-GCA-MT-006</span><div><b>${rutasTxt(v.provext).map(esc).join(" · ")}</b></div></div>`:"")+kv([["Fuente",v.fuente],["Requisito de la norma",v.requisito],["Fecha de registro",fmt(v.fecha)],["Tipo de causa",v.familia],["Detectado por",v.generado],["Aceptado por",v.aceptado]])+
-    (t==="AC"?blk("Qué se encontró (no conformidad)",v.descNC)+blk("Corrección inmediata",v.correccion)+blk("Análisis de la causa raíz"+(v.metodo?" · "+v.metodo:""),v.analisis)+blk("Causa raíz determinada",v.causa)
+    (t==="AC"?blk("Qué se encontró (no conformidad)",v.descNC)+blk("Corrección inmediata",v.correccion)+pqDetalle(v.analisis,v.metodo)+blk("Causa raíz determinada",v.causa)
              :blk("Qué se busca mejorar",v.descOM)+blk("Situación que la sustenta",v.situacionV))+
     `<h3>Plan de acción</h3>`+(d.acts.length?`<table><thead><tr><th>N.°</th><th>Actividad</th><th>Responsable</th><th>Fecha programada</th><th>Fecha realizada</th><th>Estado</th></tr></thead><tbody>
     ${d.acts.map((a,i)=>{const dt=pd(a.prog);return `<tr><td>${esc(a.n||i+1)}</td><td>${esc(a.accion)}${a.link?`<div><a href="${esc(a.link)}" target="_blank" rel="noopener">Ver evidencia</a></div>`:""}</td><td>${esc(a.resp)}</td><td class="mono ${actEst(a)!==I&&dt&&dt<HOY?"late":""}">${fmt(a.prog)||"—"}</td><td class="mono">${fmt(a.ejec)||"—"}</td><td><span class="st"><span class="dot" style="background:${actColor[actEst(a)]||"var(--gray)"}"></span>${esc(actEst(a))}</span></td></tr>`}).join("")}</tbody></table>`:"<p class='meta'>Sin actividades registradas.</p>")+
@@ -686,7 +713,7 @@ const SECS=[
   {k:"correccion",l:"Corrección realizada",ty:"area",full:1,only:"AC",h:"Qué se hizo de inmediato para contener el problema."}]},
  {t:"3. Análisis de la causa raíz",i:"Solo para acciones correctivas: se busca el porqué de fondo, no el síntoma.",only:"AC",f:[
   {k:"metodo",l:"Método aplicado",h:"Por ejemplo: 5 Porqués, Ishikawa."},
-  {k:"analisis",l:"Desarrollo del análisis",ty:"area",full:1,rows:7,h:"Escriba cada pregunta y su respuesta en una línea. Ejemplo: «1. ¿Por qué…? Porque…»."},
+  {k:"analisis",l:"Cadena de los 5 Porqués",ty:"porques",full:1,h:"Cada respuesta se convierte en la siguiente pregunta. No tienen que ser exactamente cinco: deténgase cuando llegue a la causa de fondo."},
   {k:"causa",l:"Causa raíz determinada",ty:"area",full:1,h:"La causa de fondo que, si se elimina, evita que el problema vuelva a ocurrir."}]},
  {t:"4. Plan de acción",i:"Actividades concretas para eliminar la causa o lograr la mejora. Cada una con responsable y fecha.",acts:1},
  {t:"5. Verificación y eficacia",i:"Primero se verifica que las actividades se hicieron; luego, que realmente resolvieron el problema.",f:[
@@ -720,6 +747,7 @@ function campo(fd,v){
   if(fd.ty==="sel")inp=`<select id="${id}" name="${fd.k}"${fd.req?" required":""}><option value="">— Seleccione —</option>${OPT[fd.o].map(o=>`<option${o===val?" selected":""}>${esc(o)}</option>`).join("")}${val&&!OPT[fd.o].includes(val)?`<option selected>${esc(val)}</option>`:""}</select>`;
   else if(fd.ty==="area")inp=`<textarea id="${id}" name="${fd.k}" rows="${fd.rows||3}"${fd.req?" required":""}>${esc(val)}</textarea>`;
   else if(fd.ty==="date")inp=`<input type="date" id="${id}" name="${fd.k}" value="${toISO(val)}">`;
+  else if(fd.ty==="porques")inp=`<textarea id="${id}" name="${fd.k}" hidden>${esc(val)}</textarea><div id="pqBox"></div>`;
   else if(fd.ty==="provext"){const sel=new Set(rutasTxt(val));inp=`<input type="hidden" id="${id}" name="${fd.k}" value="${esc(val)}"><div class="plist" id="provBox">${PROV_EXT.map(o=>`<label class="p0${sel.has(o)?" on":""}"><input type="checkbox" data-pv="${esc(o)}"${sel.has(o)?" checked":""}> <span>${esc(o)}</span></label>`).join("")}</div>`;}
   else if(fd.ty==="proc")inp=`<input type="hidden" id="${id}" name="${fd.k}" value="${esc(val)}"><div id="procBox"></div>`;
   else inp=`<input id="${id}" name="${fd.k}" value="${esc(val)}"${fd.req?" required":""}>`;
@@ -753,7 +781,7 @@ function editar(id){
       el.querySelectorAll("[required]").forEach(x=>x.disabled=!show);el.querySelectorAll("input,select,textarea").forEach(x=>{if(!show)x.dataset.hidden="1";else delete x.dataset.hidden})});
     if(t==="OM"&&!$("#e_clasif").value)$("#e_clasif").value="Oportunidad de mejora";};
   tipoSel.onchange=()=>{if(!EDIT.id)$("#e_codigo").value=sigCodigo(tipoSel.value);aplicarTipo();};
-  aplicarTipo();procIniciar(v.proceso);document.querySelectorAll("#provBox input").forEach(cb=>cb.onchange=()=>cb.closest("label").classList.toggle("on",cb.checked));
+  aplicarTipo();procIniciar(v.proceso);pqIniciar(v.analisis);document.querySelectorAll("#provBox input").forEach(cb=>cb.onchange=()=>cb.closest("label").classList.toggle("on",cb.checked));
   const renum=()=>document.querySelectorAll("#acts .act .ah span").forEach((s,i)=>s.textContent="Actividad "+(i+1));
   $("#addAct").onclick=()=>{$("#acts").insertAdjacentHTML("beforeend",actHTML({},$("#acts").children.length));renum();$("#acts").lastElementChild.querySelector("textarea").focus();};
   $("#acts").onclick=e=>{if(e.target.matches("[data-rm]")){e.target.closest(".act").remove();renum();}};
@@ -763,9 +791,9 @@ function editar(id){
 }
 $("#fEdit").addEventListener("submit",async e=>{
   e.preventDefault();
-  procSync();provSync();const tipo=$("#e_tipo").value;const values={};
+  procSync();provSync();pqSync();const tipo=$("#e_tipo").value;const values={};
   SECS.forEach(s=>(s.f||[]).forEach(fd=>{const el=$("#e_"+fd.k);if(!el||el.dataset.hidden)return;let val=el.value.trim();
-    if(fd.ty==="date")val=toQ(val);else if(fd.ty==="area")val=esc(val).replace(/\n/g,"<br />");values[F[fd.k]]=val;}));
+    if(fd.ty==="date")val=toQ(val);else if(fd.ty==="area"||fd.ty==="porques")val=esc(val).replace(/\n/g,"<br />");values[F[fd.k]]=val;}));
   if(!values[F.reqAnalisis]&&tipo==="Oportunidad de mejora")values[F.reqAnalisis]="No aplica";
   const acts=[...document.querySelectorAll("#acts .act")].map((el,i)=>{const o={};el.querySelectorAll("[data-a]").forEach(x=>{let val=x.value.trim();if(x.type==="date")val=toQ(val);else if(x.tagName==="TEXTAREA")val=esc(val).replace(/\n/g,"<br />");o[A[x.dataset.a]]=val});o[A.n]=String(i+1);return {id:el.dataset.aid||null,v:o}});
   const keep=acts.map(a=>a.id).filter(Boolean);const removed=EDIT.orig.filter(id=>!keep.includes(id));
@@ -819,6 +847,62 @@ function procElegidos(){const out=[];
     if(!st.size)out.push(k);else hijosProc([t,n0]).forEach(n1=>{if(st.has(n1))out.push(k+" › "+n1)});}));return out;}
 function procSync(){const el=$("#e_proceso");if(!el)return;const L=procElegidos();el.value=(L.length?L:PPREV).join(PSEP);}
 async function cargarInventario(){try{const r=await fetch(proxy+(proxy.includes("?")?"&":"?")+"action=inventario");const j=await r.json();if(j.ok&&j.rutas&&j.rutas.length>50)RUTAS=j.rutas;}catch(e){}}
+
+
+/* ═══════════ 5 Porqués: cadena pregunta → respuesta → siguiente pregunta ═══════════ */
+let PQ=[];const PQ_MAX=7;
+const pqLimpia=a=>String(a||"").trim().replace(/^porque\s*/i,"").replace(/[.\s]+$/,"");
+function pqDerivar(a){const t=pqLimpia(a);if(!t)return "";return "¿Por qué "+t.charAt(0).toLowerCase()+t.slice(1)+"?";}
+function pqParse(t){const L=String(t||"").split(/\n+/).map(x=>x.trim()).filter(Boolean);const out=[];
+  L.forEach(l=>{const m=l.match(/^\s*\d+\s*[.)-]\s*(.*?\?)\s*(.*)$/);if(m)out.push({q:m[1].trim(),a:m[2].trim(),auto:false});
+    else if(out.length&&!/^\s*\d+\s*[.)-]/.test(l))out[out.length-1].a+=(out[out.length-1].a?" ":"")+l;
+    else out.push({q:l.replace(/^\s*\d+\s*[.)-]\s*/,""),a:"",auto:false});});return out;}
+function pqIniciar(t){PQ=pqParse(t);if(!PQ.length)PQ=[{q:"",a:"",auto:false}];pqPintar();}
+function pqSync(){const el=$("#e_analisis");if(!el)return;
+  el.value=PQ.filter(p=>p.q.trim()||p.a.trim()).map((p,i)=>{let q=p.q.trim();if(q&&!/\?$/.test(q))q+="?";return `${i+1}. ${q} ${p.a.trim()}`.trim();}).join("\n");}
+function pqUrpito(){
+  const n=PQ.length,ult=PQ[n-1],lleno=ult&&ult.a.trim();
+  let tip;
+  if(!PQ[0].q.trim()&&!PQ[0].a.trim())tip="Empieza preguntando <b>por qué ocurrió el hallazgo</b> (míralo arriba, en la sección 2) y escribe la respuesta en «Porque…».";
+  else if(!lleno)tip="Escribe la respuesta del porqué "+n+". En cuanto la escribas, yo la convierto en la siguiente pregunta 😉";
+  else if(n<3)tip="¡Bien! Pulsa <b>«Preguntar otro porqué»</b>: ya dejé escrita la siguiente pregunta con tu respuesta. Puedes ajustarla si suena rara.";
+  else if(n<PQ_MAX)tip="¿Ya llegaste a la causa de fondo? Pregúntate: <i>si corrijo esto, ¿el problema deja de repetirse?</i> y <i>¿la Facultad puede actuar sobre esto?</i> Si las dos son «sí», pulsa <b>«Usar como causa raíz»</b>. Si no, pregunta otro porqué.";
+  else tip="Llegaste a "+PQ_MAX+" porqués. Elige la respuesta que explique mejor el fondo del problema y úsala como causa raíz.";
+  return `<div class="pq-urp">${window.URP&&URP.on()?URP.img("pq-urp-img"):""}<div class="urp-globo"><b>Así funcionan los 5 Porqués:</b> cada respuesta pasa a ser la siguiente pregunta, hasta llegar a la causa de fondo. No tienen que ser exactamente cinco. Busca fallas del <b>proceso o del sistema</b>, no culpables.<div class="pq-tip">💡 ${tip}</div></div></div>`;
+}
+function pqPintar(){
+  const n=PQ.length;
+  $("#pqBox").innerHTML=pqUrpito()+`<div class="pq-chain">`+PQ.map((p,i)=>`
+    <div class="pq-step">
+      <div class="pq-num" aria-hidden="true">${i+1}</div>
+      <div class="pq-body">
+        <div class="pq-h"><span>Porqué ${i+1}${i===0?" · sobre el hallazgo":""}</span>${n>1?`<button type="button" class="pq-rm" data-pqrm="${i}" title="Quitar este paso">✕ Quitar</button>`:""}</div>
+        <label for="pq_q${i}">Pregunta</label>
+        <textarea id="pq_q${i}" data-pqq="${i}" rows="2" placeholder="${i===0?"¿Por qué ocurrió…? (escriba el problema del hallazgo)":"¿Por qué …?"}">${esc(p.q)}</textarea>
+        ${p.auto&&p.q?`<div class="pq-auto">✨ Escrita a partir de la respuesta anterior. Puede ajustarla.</div>`:""}
+        <label for="pq_a${i}">Respuesta</label>
+        <textarea id="pq_a${i}" data-pqa="${i}" rows="2" placeholder="Porque …">${esc(p.a)}</textarea>
+      </div>
+    </div>${i<n-1?`<div class="pq-flecha"><span>↓</span> la respuesta ${i+1} se convierte en la pregunta ${i+2}</div>`:""}`).join("")+`</div>
+    <div class="pq-acc">
+      ${n<PQ_MAX?`<button type="button" class="btn" id="pqAdd">＋ Preguntar otro porqué</button>`:""}
+      <button type="button" class="btn pri" id="pqRaiz"${PQ[n-1].a.trim()?"":" disabled"}>★ Usar la última respuesta como causa raíz</button>
+      <span class="pq-cont">${n} de 5 porqués sugeridos${n>5?" (puede llegar hasta "+PQ_MAX+")":""}</span>
+    </div>`;
+  document.querySelectorAll("#pqBox [data-pqq]").forEach(t=>t.oninput=()=>{const i=+t.dataset.pqq;PQ[i].q=t.value;PQ[i].auto=false;});
+  document.querySelectorAll("#pqBox [data-pqa]").forEach(t=>{t.oninput=()=>{const i=+t.dataset.pqa;PQ[i].a=t.value;
+      const nx=PQ[i+1];if(nx&&(nx.auto||!nx.q.trim())){nx.q=pqDerivar(t.value);nx.auto=true;const tq=$("#pq_q"+(i+1));if(tq)tq.value=nx.q;}
+      const b=$("#pqRaiz");if(b&&i===PQ.length-1)b.disabled=!t.value.trim();};
+    t.onblur=()=>{const u=$("#pqBox .pq-urp");if(u)u.outerHTML=pqUrpito();};});
+  document.querySelectorAll("#pqBox [data-pqrm]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pqrm;PQ.splice(i,1);
+    if(PQ[i]&&PQ[i].auto)PQ[i].q=pqDerivar(PQ[i-1]?PQ[i-1].a:"");pqPintar();});
+  const add=$("#pqAdd");if(add)add.onclick=()=>{const u=PQ[PQ.length-1];PQ.push({q:pqDerivar(u.a),a:"",auto:true});pqPintar();const t=$("#pq_a"+(PQ.length-1));if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.focus();}};
+  $("#pqRaiz").onclick=()=>{const t=pqLimpia(PQ[PQ.length-1].a);if(!t)return;const c=$("#e_causa");if(!c)return;
+    c.value=t.charAt(0).toUpperCase()+t.slice(1)+".";c.scrollIntoView({block:"center",behavior:"smooth"});c.classList.add("pq-flash");setTimeout(()=>c.classList.remove("pq-flash"),1600);
+    toast("Listo: la última respuesta quedó como causa raíz. Puede ajustar su redacción.");};
+}
+function pqDetalle(t,metodo){const L=pqParse(plain(t));if(!L.length)return "";
+  return `<h3>Análisis de la causa raíz${metodo?" · "+esc(metodo):""}</h3><div class="pq-det">${L.map((p,i)=>`<div class="pq-dstep"><div class="pq-num">${i+1}</div><div><div class="pq-dq">${esc(p.q)}</div><div class="pq-da">${esc(p.a)}</div></div></div>`).join('<div class="pq-dfl">↓</div>')}</div>`;}
 
 /* ═══════════ sesión ═══════════ */
 let trasLogin=null;
