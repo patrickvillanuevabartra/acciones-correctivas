@@ -210,6 +210,7 @@ footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
 
 
 
+.acc-box{white-space:pre-wrap;background:var(--note-bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:15.5px;line-height:1.6}
 /* secciones por rol */
 .own{display:inline-block;font-size:12.5px;font-weight:600;padding:2px 9px;border-radius:999px;margin-left:6px;vertical-align:middle;letter-spacing:0;text-transform:none}
 .own-C{background:#e8eefc;color:#2459c9}.own-R{background:#e7f5ee;color:#0b6e47}.own-V{background:#fdf1df;color:#8a5200}
@@ -479,6 +480,9 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
   </div></div>
   <div class="mf"><button type="button" class="btn" data-close>Cancelar</button><button type="submit" class="btn pri" id="uBtn">Guardar usuario</button></div>
 </form></dialog>
+<dialog id="dAcceso" class="sm"><div class="mh"><div><h2>Datos de acceso para entregar</h2><div class="meta">Esta es la única vez que se puede ver la clave. Cópiela y entréguela en privado (correo institucional o WhatsApp personal).</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
+  <div class="mb"><div class="acc-box" id="accTxt"></div><p class="meta" style="margin-top:10px">Si la persona la olvida, vuelva a «Editar» y pulse «Generar» para asignarle una nueva.</p></div>
+  <div class="mf"><button type="button" class="btn" data-close>Cerrar</button><button type="button" class="btn pri" id="accCopiar">📋 Copiar mensaje</button></div></dialog>
 <dialog id="dConf" class="sm"><div class="mh"><div><h2 id="cT"></h2></div></div><div class="mb"><p id="cM"></p></div><div class="mf"><button class="btn" id="cNo">Cancelar</button><button class="btn pri" id="cSi">Confirmar</button></div></dialog>
 <div class="toast" id="toast"></div>
 
@@ -1055,9 +1059,15 @@ $("#uGen").onclick=()=>{const a="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ
 $("#fUser").addEventListener("submit",async e=>{
   e.preventDefault();const b=$("#uBtn");b.disabled=true;$("#uErr").textContent="";
   const user={id:UED&&UED.id,correo:$("#uCorreo").value.trim(),usuario:$("#uUsuario").value.trim().toLowerCase(),procesos:[...document.querySelectorAll("#uProc input:checked")].map(x=>x.dataset.uk).join(" ; "),verTodo:$("#uVerTodo").checked,coordExt:$("#uCoordExt").checked,verifica:$("#uVerifica").checked,nombre:$("#uNombre").value.trim(),cargo:$("#uCargo").value.trim(),estado:$("#uEstado").value,clave:$("#uClave").value.trim()};
-  try{await post({action:"user_save",user});$("#dUser").close();toast(user.clave?"Usuario guardado. Recuerde entregarle su clave.":"Usuario guardado.");admCargar();}
+  try{await post({action:"user_save",user});$("#dUser").close();admCargar();if(user.clave)mostrarAcceso(user);else toast("Usuario guardado.");}
   catch(err){$("#uErr").textContent=err.message;}finally{b.disabled=false;}
 });
+function mostrarAcceso(u){
+  const url=location.origin+location.pathname;
+  const txt=`Estimado(a) ${u.nombre||""}:\n\nLe comparto su acceso al aplicativo de Acciones Correctivas y Oportunidades de Mejora del SGOE de la Facultad de Ingeniería:\n\n• Enlace: ${url}\n• Usuario: ${u.usuario||u.correo}${u.usuario?"  (también puede ingresar con su correo "+u.correo+")":""}\n• Contraseña: ${u.clave}\n\nAl ingresar puede cambiar su contraseña con el botón «Cambiar mi clave».\n\nSaludos,\n${(SES&&SES.nombre)||"Comité SGOE"}`;
+  $("#accTxt").textContent=txt;$("#dAcceso").showModal();
+  $("#accCopiar").onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("Mensaje copiado. Péguelo en el correo o WhatsApp de la persona.");}catch(e){const rg=document.createRange();rg.selectNodeContents($("#accTxt"));const sl=getSelection();sl.removeAllRanges();sl.addRange(rg);toast("Seleccioné el mensaje: cópielo con Ctrl + C.");}};
+}
 $("#uNuevo").onclick=()=>abrirUsuario(null);
 $("#uRecargar").onclick=$("#logRecargar").onclick=()=>admCargar();
 $("#logQ").oninput=()=>pintarLog();
