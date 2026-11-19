@@ -731,7 +731,7 @@ const SECS=[
   {k:"periodo",l:"Periodo de evaluación",h:"Ejemplo: cierre del 2026-II, primer trimestre de 2027."},
   {k:"fRealEf",l:"Fecha real de evaluación",ty:"date",h:"Cuándo se evaluó efectivamente."},
   {k:"resEf",l:"Resultado de la eficacia",ty:"sel",o:"resEf",h:"Resultado de la evaluación de eficacia. Eficaz: el problema no se repitió o la mejora se logró."},
-  {k:"evRev",l:"Evidencia revisada",ty:"area",full:1,h:"Documentos o registros con los que se comprobó."},
+  {k:"evRev",l:"Evidencia revisada",ty:"area",full:1,h:"Documentos o registros con los que se comprobó la ejecución del plan y su eficacia (actas, oficios, reportes, enlaces). Es el único lugar del formato FR-007 donde se consigna la evidencia."},
   {k:"evPrev",l:"Evidencia prevista",ty:"area",full:1,only:"OM",h:"Documentos o registros que se espera obtener."},
   {k:"obsEf",l:"Observaciones",ty:"area",full:1,h:"Justificación del resultado o del plazo de evaluación."}]},
  {t:"8. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada.",f:[
@@ -765,7 +765,6 @@ function actHTML(a,i){
     <div class="fi"><label>Estado</label><select data-a="estado">${OPT.actEstado.map(o=>`<option${o===(a.estado||N)?" selected":""}>${o}</option>`).join("")}</select></div>
     <div class="fi"><label>Fecha programada</label><input type="date" data-a="prog" value="${toISO(a.prog)}"></div>
     <div class="fi"><label>Fecha de ejecución</label><input type="date" data-a="ejec" value="${toISO(a.ejec)}"></div>
-    <div class="fi full"><label>Enlace a la evidencia (opcional)</label><input type="url" data-a="link" value="${esc(a.link)}" placeholder="https://…"></div>
    </div></div>`;
 }
 function editar(id){
