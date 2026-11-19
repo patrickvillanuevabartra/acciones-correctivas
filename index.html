@@ -364,7 +364,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
       <select id="fEst" aria-label="Filtrar por etapa"><option value="">Todas las etapas</option></select>
       <select id="fFam" aria-label="Filtrar por tipo de causa"><option value="">Todos los tipos de causa</option></select>
       <input type="search" id="q" placeholder="Buscar por código, proceso o palabra…" aria-label="Buscar">
-      <label class="chk"><input type="checkbox" id="fArch"> Mostrar archivados</label>
+      <label class="chk" id="fArchWrap" hidden><input type="checkbox" id="fArch"> Mostrar archivados</label>
     </div>
     <div id="cards"><div class="empty">Cargando expedientes…</div></div>
   </section>
@@ -404,7 +404,6 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
     <div class="admnav">
       <button class="btn" data-go="aRoles">Roles y permisos</button>
       <button class="btn" data-go="aUsr">Usuarios</button>
-      <button class="btn" data-go="aArch">Expedientes archivados</button>
       <button class="btn" data-go="aResp">Respaldos</button>
     </div>
 
@@ -426,11 +425,6 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
     </section>
 
 
-    <section class="admsec" id="aArch">
-      <h2>Expedientes archivados</h2>
-      <p class="pn">Los expedientes archivados no se cuentan en los indicadores ni aparecen en la lista principal, pero se conservan. Puede devolver cualquiera a la lista de vigentes.</p>
-      <div id="archLista"></div>
-    </section>
 
     <section class="admsec" id="aResp">
       <h2>Respaldos</h2>
@@ -586,7 +580,7 @@ function sinConexion(motivo){
 const codigosDe=t=>String(t||"").match(/\b[EMS]\d{2}(?:\.\d{2})*\b/g)||[];
 function puedeEditar(d){if(!SES)return false;if(esAdmin()||SES.verifica)return true;if(SES.coordExt&&d&&String(d.v.provext||"").trim())return true;const m=codigosDe(SES.procesos),e=codigosDe(d?d.v.proceso:"");return m.some(x=>e.some(y=>y===x||y.startsWith(x+".")));}
 function avisoPermisos(){
-  $("#bNuevo").hidden=!esAdmin();
+  $("#bNuevo").hidden=!esAdmin();$("#fArchWrap").hidden=!esAdmin();if(!esAdmin()&&FL.arch){FL.arch=false;$("#fArch").checked=false;}
   if(!SES||esAdmin()){$("#banner").innerHTML="";return;}
   const vtxt=SES.verifica?" Además, como Unidad de Calidad y Acreditación, completa la <b>sección 6 (verificación de la implementación)</b> de todos los expedientes.":"";
   const L=rutasTxt(SES.procesos).map(x=>segsDe(x).slice(-1)[0]);
@@ -1014,7 +1008,7 @@ function pintarUsuarios(){
      <td><button class="btn" data-ued="${esc(u.id)}">Editar</button></td></tr>`).join("")}</tbody></table>`:'<div class="empty">Aún no hay usuarios registrados.</div>';
   document.querySelectorAll("[data-ued]").forEach(b=>b.onclick=()=>abrirUsuario(USERS.find(x=>x.id===b.dataset.ued)));
 }
-function pintarArchivados(){
+function pintarArchivados(){if(!$("#archLista"))return;
   const A=RECS.filter(d=>!vig(d)).sort((a,b)=>(a.v.codigo||"").localeCompare(b.v.codigo||""));
   $("#archLista").innerHTML=A.length?A.map(d=>`<article class="row arch" style="--c:var(--gray)"><div><div class="code">${esc(d.v.codigo||"(sin código)")}</div><span class="tag ARCH">Archivado</span></div>
      <div><div class="pr">${esc(procCorto(d.v.proceso))}</div><div class="d">${esc(desc(d))}</div></div><div class="st">${esc(fmt(d.v.fecha)||"")}</div><div></div>
