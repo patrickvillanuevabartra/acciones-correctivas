@@ -692,49 +692,52 @@ function verDetalle(id){
 
 /* ═══════════ edición ═══════════ */
 const SECS=[
- {t:"1. Datos generales",i:"Identifican el expediente. El código sigue la numeración del año.",f:[
-  {k:"tipo",l:"Tipo de expediente",ty:"sel",o:"tipo",req:1,h:"Acción correctiva: hubo un incumplimiento. Oportunidad de mejora: no hubo incumplimiento, pero se puede mejorar."},
-  {k:"codigo",l:"Código",req:1,h:"Ejemplo: AC N°04-2026 u OM N°08/2026. Se propone el siguiente número disponible."},
-  {k:"fecha",l:"Fecha de registro",ty:"date",h:"Día en que se identificó o registró el hallazgo."},
-  {k:"fuente",l:"Origen del hallazgo",ty:"sel",o:"fuente",h:"Dónde se detectó: auditoría, revisión por la dirección, Comité SGOE, quejas, etc."},
+ {t:"1. Identificación del hallazgo",i:"La completa el Comité SGOE a partir del informe de auditoría u otra fuente. El N.° de registro sigue la numeración del año.",f:[
+  {k:"codigo",l:"N.° de registro",req:1,h:"Ejemplo: AC N°04-2026 u OM N°08/2026. Se propone el siguiente número disponible."},
+  {k:"fecha",l:"Fecha de registro",ty:"date",h:"Día en que se registró el hallazgo."},
+  {k:"tipo",l:"Tipo de solicitud",ty:"sel",o:"tipo",req:1,h:"Acción correctiva: hubo un incumplimiento. Oportunidad de mejora: no hubo incumplimiento, pero se puede mejorar."},
   {k:"clasif",l:"Clasificación",ty:"sel",o:"clasif",h:"No conformidad: incumple un requisito. Menor: incumplimiento puntual que no afecta al sistema completo."},
-  {k:"requisito",l:"Requisito de la norma",h:"Numeral de la ISO 21001 relacionado. Ejemplo: 7.5.3 de ISO 21001:2018."},
-  {k:"proceso",l:"Proceso involucrado",full:1,ty:"proc",h:"Marque uno o varios procesos de nivel 0 del inventario de procesos. Si desea precisar, al marcar uno aparecen debajo sus procesos de nivel 1: marque los que correspondan (es opcional)."},
+  {k:"proceso",l:"Proceso",full:1,ty:"proc",h:"Marque uno o varios procesos de nivel 0 del inventario de procesos. Si desea precisar, al marcar uno aparecen debajo sus procesos de nivel 1: marque los que correspondan (es opcional)."},
   {k:"provext",l:"Proveedor(es) externo(s) involucrado(s)",full:1,ty:"provext",h:"Solo si en el hallazgo interviene un órgano central de la URP que provee un proceso, producto o servicio a la Facultad, según la <b>Matriz de Proveedores Externos al SGOE (FI-GCA-MT-006)</b>. Al marcarlo, la Unidad de Calidad y Acreditación también podrá completar el expediente. Si no interviene ninguno, déjelo en blanco."},
-  {k:"familia",l:"Tipo de causa",ty:"sel",o:"familia",only:"AC",h:"Agrupa hallazgos con causas parecidas para detectar problemas que se repiten."},
-  {k:"generado",l:"Detectado por",h:"Persona o instancia que identificó el hallazgo (auditor, Comité SGOE…)."},
-  {k:"aceptado",l:"Aceptado por",h:"Responsable que acepta el hallazgo y se compromete a atenderlo."}]},
- {t:"2. Descripción del hallazgo",i:"Explique con hechos concretos y verificables qué se encontró.",f:[
-  {k:"descNC",l:"Qué se encontró (no conformidad)",ty:"area",full:1,req:1,only:"AC",h:"Describa el incumplimiento: qué, dónde y cuándo. Evite opiniones; indique la evidencia."},
-  {k:"descOM",l:"Qué se busca mejorar (objetivo)",ty:"area",full:1,req:1,only:"OM",h:"Describa la mejora que se quiere lograr."},
-  {k:"situacionV",l:"Situación verificada que la sustenta",ty:"area",full:1,only:"OM",h:"Hechos que muestran por qué conviene esta mejora."},
-  {k:"reqCorr",l:"¿Requiere corrección inmediata?",ty:"sel",o:"siNo",only:"AC",h:"La corrección «apaga el incendio» mientras se ataca la causa. Si no aplica, indique «No aplica»."},
-  {k:"fCorr",l:"Fecha de la corrección",ty:"date",only:"AC",h:"Día en que se realizó la corrección inmediata."},
-  {k:"correccion",l:"Corrección realizada",ty:"area",full:1,only:"AC",h:"Qué se hizo de inmediato para contener el problema."}]},
- {t:"3. Análisis de la causa raíz",i:"Solo para acciones correctivas: se busca el porqué de fondo, no el síntoma.",only:"AC",f:[
-  {k:"metodo",l:"Método aplicado",h:"Por ejemplo: 5 Porqués, Ishikawa."},
+  {k:"fuente",l:"Fuente del hallazgo",ty:"sel",o:"fuente",h:"Dónde se detectó: auditoría interna, revisión por la dirección, Comité SGOE, quejas, etc."},
+  {k:"requisito",l:"Requisito ISO 21001:2018",h:"Numeral de la norma relacionado. Ejemplo: 7.5.3 de ISO 21001:2018."},
+  {k:"generado",l:"Generado por (nombre y cargo)",h:"Persona que identificó el hallazgo (auditor, Comité SGOE…)."},
+  {k:"aceptado",l:"Aceptado por (nombre y cargo)",h:"Responsable que acepta el hallazgo y se compromete a atenderlo."},
+  {k:"estado",l:"Estado del expediente",ty:"sel",o:"estado",req:1,h:"Etapa en que se encuentra. Determina el color de la tarjeta y los indicadores."},
+  {k:"familia",l:"Familia de causa",ty:"sel",o:"familia",only:"AC",h:"Agrupa los hallazgos con causas parecidas (hoja «Por familia de causa» del FR-008). Se asigna después del análisis de causa raíz."}]},
+ {t:"2. Descripción del hallazgo",i:"Hechos concretos y verificables de lo que se encontró.",f:[
+  {k:"descNC",l:"Descripción del hallazgo",ty:"area",full:1,req:1,only:"AC",h:"Describa el incumplimiento: qué, dónde y cuándo, y el requisito que establece la norma. Evite opiniones; indique la evidencia."},
+  {k:"descOM",l:"Descripción del hallazgo (objetivo de la mejora)",ty:"area",full:1,req:1,only:"OM",h:"Describa la mejora que se quiere lograr."},
+  {k:"situacionV",l:"Situación verificada que la sustenta",ty:"area",full:1,only:"OM",h:"Hechos que muestran por qué conviene esta mejora."}]},
+ {t:"3. Corrección inmediata",i:"La completa el responsable del proceso. La corrección «apaga el incendio» mientras se ataca la causa.",f:[
+  {k:"reqCorr",l:"¿Requiere corrección?",ty:"sel",o:"siNo",h:"Si no hace falta contener nada de inmediato, indique «No aplica»."},
+  {k:"fCorr",l:"Fecha de la corrección",ty:"date",h:"Día en que se realizó la corrección inmediata."},
+  {k:"correccion",l:"Corrección realizada",ty:"area",full:1,h:"Qué se hizo de inmediato para contener el problema."}]},
+ {t:"4. Análisis de la causa raíz",i:"Lo completa el responsable del proceso: se busca el porqué de fondo, no el síntoma.",f:[
+  {k:"reqAnalisis",l:"¿Requiere análisis de causa?",ty:"sel",o:"siNo",only:"OM",h:"Según el FI-GCA-PR-003, el análisis de causa corresponde a las no conformidades; en una oportunidad de mejora puede no aplicar."},
+  {k:"metodo",l:"Metodología aplicada",h:"Por ejemplo: 5 Porqués, Ishikawa."},
   {k:"analisis",l:"Cadena de los 5 Porqués",ty:"porques",full:1,h:"Cada respuesta se convierte en la siguiente pregunta. No tienen que ser exactamente cinco: deténgase cuando llegue a la causa de fondo."},
   {k:"causa",l:"Causa raíz determinada",ty:"area",full:1,h:"La causa de fondo que, si se elimina, evita que el problema vuelva a ocurrir."}]},
- {t:"4. Plan de acción",i:"Actividades concretas para eliminar la causa o lograr la mejora. Cada una con responsable y fecha.",acts:1},
- {t:"5. Verificación y eficacia",i:"Primero se verifica que las actividades se hicieron; luego, que realmente resolvieron el problema.",f:[
-  {k:"criterio",l:"Cómo se comprobará que funcionó (criterio de eficacia)",ty:"area",full:1,h:"Describa qué evidencia demostrará que el problema no se repite o que la mejora se logró."},
-  {k:"evRev",l:"Evidencia revisada",ty:"area",full:1,h:"Documentos o registros con los que se comprobó."},
-  {k:"evPrev",l:"Evidencia prevista",ty:"area",full:1,only:"OM",h:"Documentos o registros que se espera obtener."},
+ {t:"5. Plan de acción",i:"Lo completa el responsable del proceso: actividades concretas para eliminar la causa o lograr la mejora, cada una con su responsable de la implementación, fecha programada, fecha de ejecución y estado.",acts:1},
+ {t:"6. Verificación de la implementación",i:"Se completa después de ejecutado el plan: se comprueba que las actividades se hicieron.",f:[
+  {k:"respVerif",l:"Responsable de la verificación",h:"Quién comprueba (normalmente la Unidad de Calidad y Acreditación o el Comité SGOE)."},
   {k:"fVerif",l:"Fecha de verificación",ty:"date",h:"Día en que se comprobó la ejecución de las actividades."},
-  {k:"respVerif",l:"Responsable de la verificación",h:"Quién comprobó (normalmente el Comité SGOE)."},
-  {k:"resVerif",l:"Resultado de la verificación",ty:"sel",o:"resVerif",h:"¿Se ejecutaron las actividades del plan?"},
-  {k:"obsVerif",l:"Observaciones de la verificación",ty:"area",full:1,h:"Cambios al plan, hallazgos relacionados u otras precisiones."},
-  {k:"periodo",l:"Periodo de evaluación de la eficacia",h:"Ejemplo: cierre del 2026-II, primer trimestre de 2027."},
+  {k:"resVerif",l:"Resultado",ty:"sel",o:"resVerif",h:"¿Se ejecutaron las actividades del plan?"},
+  {k:"obsVerif",l:"Observaciones",ty:"area",full:1,h:"Cambios al plan, hallazgos relacionados u otras precisiones."}]},
+ {t:"7. Evaluación de la eficacia",i:"Se comprueba que las actividades realmente resolvieron el problema o lograron la mejora.",f:[
+  {k:"criterio",l:"Criterio de eficacia (cómo se comprobará)",ty:"area",full:1,h:"Qué evidencia demostrará que el problema no se repite o que la mejora se logró."},
   {k:"fProgEf",l:"Fecha programada de evaluación",ty:"date",h:"Cuándo se evaluará si la acción fue eficaz."},
+  {k:"periodo",l:"Periodo de evaluación",h:"Ejemplo: cierre del 2026-II, primer trimestre de 2027."},
   {k:"fRealEf",l:"Fecha real de evaluación",ty:"date",h:"Cuándo se evaluó efectivamente."},
   {k:"resEf",l:"Resultado de la eficacia",ty:"sel",o:"resEf",h:"Eficaz: el problema no se repitió o la mejora se logró."},
-  {k:"obsEf",l:"Observaciones de la eficacia",ty:"area",full:1,h:"Justificación del resultado o del plazo de evaluación."}]},
- {t:"6. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada.",f:[
-  {k:"estado",l:"Estado del expediente",ty:"sel",o:"estado",req:1,h:"Etapa en que se encuentra. Determina el color de la tarjeta y los indicadores."},
+  {k:"evRev",l:"Evidencia revisada",ty:"area",full:1,h:"Documentos o registros con los que se comprobó."},
+  {k:"evPrev",l:"Evidencia prevista",ty:"area",full:1,only:"OM",h:"Documentos o registros que se espera obtener."},
+  {k:"obsEf",l:"Observaciones",ty:"area",full:1,h:"Justificación del resultado o del plazo de evaluación."}]},
+ {t:"8. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada.",f:[
   {k:"fCierre",l:"Fecha de cierre",ty:"date",h:"Solo cuando el expediente se cierra."},
   {k:"respCierre",l:"Responsable del cierre",h:"Quién da conformidad al cierre."},
   {k:"resCierre",l:"Resultado del cierre",ty:"sel",o:"resCierre",h:"Conforme si todas las acciones se implementaron."},
-  {k:"obsCierre",l:"Observaciones del cierre",ty:"area",full:1,h:"Notas para la revisión por la dirección u otras precisiones."}]}
+  {k:"obsCierre",l:"Observaciones",ty:"area",full:1,h:"Notas para la revisión por la dirección u otras precisiones."}]}
 ];
 let EDIT=null;
 function sigCodigo(tipo){
@@ -756,11 +759,11 @@ function campo(fd,v){
 function actHTML(a,i){
   return `<div class="act" data-aid="${esc(a.id||"")}"><div class="ah"><span>Actividad ${i+1}</span><button type="button" class="btn dan" data-rm>Quitar</button></div>
    <div class="fg">
-    <div class="fi full"><label>Qué se hará <span class="req">*</span></label><textarea data-a="accion" rows="2" required>${esc(a.accion)}</textarea></div>
-    <div class="fi"><label>Responsable</label><input data-a="resp" value="${esc(a.resp)}"></div>
+    <div class="fi full"><label>Actividad <span class="req">*</span></label><textarea data-a="accion" rows="2" required>${esc(a.accion)}</textarea></div>
+    <div class="fi"><label>Responsable de la implementación</label><input data-a="resp" value="${esc(a.resp)}"></div>
     <div class="fi"><label>Estado</label><select data-a="estado">${OPT.actEstado.map(o=>`<option${o===(a.estado||N)?" selected":""}>${o}</option>`).join("")}</select></div>
     <div class="fi"><label>Fecha programada</label><input type="date" data-a="prog" value="${toISO(a.prog)}"></div>
-    <div class="fi"><label>Fecha en que se realizó</label><input type="date" data-a="ejec" value="${toISO(a.ejec)}"></div>
+    <div class="fi"><label>Fecha de ejecución</label><input type="date" data-a="ejec" value="${toISO(a.ejec)}"></div>
     <div class="fi full"><label>Enlace a la evidencia (opcional)</label><input type="url" data-a="link" value="${esc(a.link)}" placeholder="https://…"></div>
    </div></div>`;
 }
@@ -1036,7 +1039,7 @@ function urpBurbuja(texto){
 function urpGuias(){
   const e=$("#urpExp");if(e)e.innerHTML=urpBurbuja("¡Hola! Soy <b>Urpito</b>, del <b>SGOE FI URP</b> 😊 Aquí ves en qué etapa está cada expediente. Pulsa una etapa para ver solo esos, o baja a la lista y pulsa <b>Ver detalle</b> para leer uno completo. Los números y las fechas los encuentras en la pestaña <b>Indicadores y fechas</b>.");
   const a=$("#urpAdm");if(a)a.innerHTML=urpBurbuja("Aquí das o quitas el permiso para editar. Para que alguien nuevo pueda editar: pulsa <b>Agregar usuario</b>, escribe su correo y su nombre, pulsa <b>Generar</b> para crear su clave y entrégasela en privado. Todo lo que se hace queda anotado en la <b>Bitácora</b>.");
-  const f=$("#urpEdit");if(f)f.innerHTML=urpBurbuja("Te acompaño 😊 Completa las secciones en orden, de la 1 a la 6. Debajo del nombre de cada campo hay una nota verde que te explica qué escribir. Solo los campos con <span class='late'>*</span> son obligatorios; lo demás puedes completarlo después. Al final pulsa <b>Guardar en QuintaDB</b>.");
+  const f=$("#urpEdit");if(f)f.innerHTML=urpBurbuja("Te acompaño 😊 Las secciones son las mismas del formato <b>FI-GCA-FR-007</b>, de la 1 a la 8. La 1 y la 2 las completa el Comité SGOE; la <b>3, 4 y 5</b> el responsable del proceso; la 6, 7 y 8 se completan después de ejecutado el plan. Debajo del nombre de cada campo hay una nota verde que te explica qué escribir, y solo los campos con <span class='late'>*</span> son obligatorios.");
 }
 window.urpTrasAlternar=urpGuias;
 
