@@ -474,14 +474,14 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
       <label class="vtodo"><input type="checkbox" id="uVerifica"> <span><b>Verifica la implementación (sección 6)</b>: ve todos los expedientes y completa su verificación con las evidencias de ejecución. Corresponde a la Unidad de Calidad y Acreditación, como indica el formato.</span></label>
       <label class="vtodo"><input type="checkbox" id="uVerTodo"> <span>Además, puede <b>consultar</b> todos los expedientes de la Facultad (solo ver, no editar)</span></label></div>
     <div class="fi"><label for="uEstado">Estado</label><div class="hl">«Inactivo» le quita el acceso para editar sin borrar su historial.</div><select id="uEstado"><option>Activo</option><option>Inactivo</option></select></div>
-    <div class="fi"><label for="uClave">Clave <span id="uClaveReq" class="req">*</span></label><div class="hl" id="uClaveNota">Mínimo 6 caracteres. Use «Generar» para crear una al azar y entréguela al usuario por un medio privado: después no se puede volver a ver.</div>
+    <div class="fi"><label for="uClave">Clave <span id="uClaveReq" class="req">*</span></label><div class="hl" id="uClaveNota">Mínimo 6 caracteres. Escriba una o use «Generar» para crear una al azar. Al guardar, se mostrará el mensaje de acceso listo para entregar.</div>
       <div style="display:flex;gap:8px"><input id="uClave" type="text" autocomplete="off" minlength="6" style="flex:1"><button type="button" class="btn" id="uGen">Generar</button></div></div>
     <p id="uErr" class="late"></p>
   </div></div>
   <div class="mf"><button type="button" class="btn" data-close>Cancelar</button><button type="submit" class="btn pri" id="uBtn">Guardar usuario</button></div>
 </form></dialog>
-<dialog id="dAcceso" class="sm"><div class="mh"><div><h2>Datos de acceso para entregar</h2><div class="meta">Esta es la única vez que se puede ver la clave. Cópiela y entréguela en privado (correo institucional o WhatsApp personal).</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
-  <div class="mb"><div class="acc-box" id="accTxt"></div><p class="meta" style="margin-top:10px">Si la persona la olvida, vuelva a «Editar» y pulse «Generar» para asignarle una nueva.</p></div>
+<dialog id="dAcceso" class="sm"><div class="mh"><div><h2>Datos de acceso para entregar</h2><div class="meta">Cópielo y entrégueselo en privado (correo institucional o WhatsApp personal). La contraseña también queda visible en Administración › Usuarios.</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
+  <div class="mb"><div class="acc-box" id="accTxt"></div><p class="meta" style="margin-top:10px">Si la persona la olvida, la puede consultar en la tabla de Usuarios.</p></div>
   <div class="mf"><button type="button" class="btn" data-close>Cerrar</button><button type="button" class="btn pri" id="accCopiar">📋 Copiar mensaje</button></div></dialog>
 <dialog id="dConf" class="sm"><div class="mh"><div><h2 id="cT"></h2></div></div><div class="mb"><p id="cM"></p></div><div class="mf"><button class="btn" id="cNo">Cancelar</button><button class="btn pri" id="cSi">Confirmar</button></div></dialog>
 <div class="toast" id="toast"></div>
@@ -1014,11 +1014,11 @@ async function admCargar(){
 }
 function pintarUsuarios(){
   const L=[...USERS].sort((a,b)=>(b.fijo-a.fijo)||(a.estado.localeCompare(b.estado))||a.nombre.localeCompare(b.nombre));
-  $("#uTabla").innerHTML=L.length?`<table><thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Cargo o unidad</th><th>Procesos a su cargo</th><th>Rol</th><th>Estado</th><th>Clave</th><th>Último ingreso</th><th></th></tr></thead><tbody>
+  $("#uTabla").innerHTML=L.length?`<table><thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Cargo o unidad</th><th>Procesos a su cargo</th><th>Rol</th><th>Estado</th><th>Contraseña</th><th>Último ingreso</th><th></th></tr></thead><tbody>
    ${L.map(u=>`<tr><td><b>${esc(u.nombre)}</b></td><td>${u.usuario?`<b class="mono">${esc(u.usuario)}</b>`:'<span class="meta">—</span>'}</td><td>${esc(u.correo)}</td><td>${esc(u.cargo)}</td><td>${u.fijo?'<span class="meta">Todos</span>':(rutasTxt(u.procesos).map(x=>esc(segsDe(x).slice(-1)[0])).join("<br>")||(u.coordExt?"":'<span class="badge warn">Sin asignar</span>'))+(u.coordExt&&!u.fijo?'<div class="meta">+ proveedores externos</div>':"")+(u.verifica&&!u.fijo?'<div class="meta">+ verificación (sección 6)</div>':"")+(u.verTodo&&!u.fijo?'<div class="meta">+ consulta todos</div>':"")}</td>
      <td>${u.fijo?'<span class="badge fix">Administrador fijo</span>':'<span class="badge">Editor</span>'}</td>
      <td>${u.estado==="Activo"?'<span class="badge">Activo</span>':'<span class="badge off">Inactivo</span>'}</td>
-     <td>${u.tieneClave?"Asignada":(u.fijo?"Usa la clave maestra":'<span class="badge warn">Sin clave</span>')}</td>
+     <td>${u.clave?`<span class="mono">${esc(u.clave)}</span>`:u.tieneClave?'<span class="meta">Se verá en su próximo ingreso</span>':(u.fijo?"Usa la clave maestra":'<span class="badge warn">Sin clave</span>')}</td>
      <td>${esc(u.ultimo?u.ultimo.replace(/-/g,"/"):"Nunca")}</td>
      <td><button class="btn" data-ued="${esc(u.id)}">Editar</button></td></tr>`).join("")}</tbody></table>`:'<div class="empty">Aún no hay usuarios registrados.</div>';
   document.querySelectorAll("[data-ued]").forEach(b=>b.onclick=()=>abrirUsuario(USERS.find(x=>x.id===b.dataset.ued)));
@@ -1050,8 +1050,8 @@ function abrirUsuario(u){
    document.querySelectorAll("#uProc input").forEach(cb=>cb.onchange=()=>cb.closest("label").classList.toggle("on",cb.checked));
    $("#uVerTodo").checked=!!(u&&u.verTodo);$("#uCoordExt").checked=!!(u&&u.coordExt);$("#uVerifica").checked=!!(u&&u.verifica);}$("#uNombre").value=u?u.nombre:"";$("#uCargo").value=u?u.cargo:"";
   $("#uEstado").value=u?u.estado:"Activo";$("#uEstado").disabled=fijo;
-  $("#uClave").value="";$("#uClave").required=!u;$("#uClaveReq").hidden=!!u;
-  $("#uClaveNota").textContent=u?"Déjelo en blanco para mantener la clave actual. Si escribe una nueva, reemplaza a la anterior: entréguela al usuario por un medio privado.":"Mínimo 6 caracteres. Use «Generar» para crear una al azar y entréguela al usuario por un medio privado: después no se puede volver a ver.";
+  $("#uClave").value=u?(u.clave||""):"";$("#uClave").required=!u;$("#uClaveReq").hidden=!!u;
+  $("#uClaveNota").textContent=u?"Es la contraseña actual de la persona. Puede cambiarla escribiendo otra o con «Generar»; al guardar, se mostrará el mensaje de acceso para entregársela.":"Mínimo 6 caracteres. Escriba una o use «Generar» para crear una al azar. Al guardar, se mostrará el mensaje de acceso listo para entregar.";
   $("#uErr").textContent=fijo?"Administrador fijo: siempre está activo y con rol de administrador.":"";
   $("#dUser").showModal();
 }
@@ -1059,7 +1059,8 @@ $("#uGen").onclick=()=>{const a="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ
 $("#fUser").addEventListener("submit",async e=>{
   e.preventDefault();const b=$("#uBtn");b.disabled=true;$("#uErr").textContent="";
   const user={id:UED&&UED.id,correo:$("#uCorreo").value.trim(),usuario:$("#uUsuario").value.trim().toLowerCase(),procesos:[...document.querySelectorAll("#uProc input:checked")].map(x=>x.dataset.uk).join(" ; "),verTodo:$("#uVerTodo").checked,coordExt:$("#uCoordExt").checked,verifica:$("#uVerifica").checked,nombre:$("#uNombre").value.trim(),cargo:$("#uCargo").value.trim(),estado:$("#uEstado").value,clave:$("#uClave").value.trim()};
-  try{await post({action:"user_save",user});$("#dUser").close();admCargar();if(user.clave)mostrarAcceso(user);else toast("Usuario guardado.");}
+  if(UED&&user.clave&&user.clave===(UED.clave||""))delete user.clave;
+  try{await post({action:"user_save",user});$("#dUser").close();admCargar();if(user.clave&&(!UED||user.clave!==(UED.clave||"")))mostrarAcceso(user);else toast("Usuario guardado.");}
   catch(err){$("#uErr").textContent=err.message;}finally{b.disabled=false;}
 });
 function mostrarAcceso(u){
@@ -1087,7 +1088,7 @@ function csv(nombre,cab,filas){
 }
 const hoyTxt=()=>{const d=new Date();return `${d.getFullYear()}-${two(d.getMonth()+1)}-${two(d.getDate())}`};
 $("#uCsv").onclick=()=>{if(!USERS.length){toast("Todavía no se ha leído la lista de usuarios.",1);return;}
-  csv(`Usuarios_AC_OM_${hoyTxt()}.csv`,["Nombre","Usuario","Correo","Cargo o unidad","Procesos a su cargo","Coordina proveedores externos","Verifica (sección 6)","Puede ver todos","Rol","Estado","Tiene clave","Último ingreso"],USERS.map(u=>[u.nombre,u.usuario||"",u.correo,u.cargo,u.fijo?"Todos":rutasTxt(u.procesos).map(x=>segsDe(x).slice(-1)[0]).join("; "),u.coordExt?"Sí":"No",u.verifica?"Sí":"No",u.fijo||u.verTodo?"Sí":"No",u.rol||(u.fijo?"Administrador":"Editor"),u.estado,u.tieneClave?"Sí":"No",u.ultimo||""]));};
+  csv(`Usuarios_AC_OM_${hoyTxt()}.csv`,["Nombre","Usuario","Correo","Cargo o unidad","Procesos a su cargo","Coordina proveedores externos","Verifica (sección 6)","Puede ver todos","Rol","Estado","Contraseña","Último ingreso"],USERS.map(u=>[u.nombre,u.usuario||"",u.correo,u.cargo,u.fijo?"Todos":rutasTxt(u.procesos).map(x=>segsDe(x).slice(-1)[0]).join("; "),u.coordExt?"Sí":"No",u.verifica?"Sí":"No",u.fijo||u.verTodo?"Sí":"No",u.rol||(u.fijo?"Administrador":"Editor"),u.estado,u.clave||(u.fijo?"Clave maestra":""),u.ultimo||""]));};
 $("#rExp").onclick=()=>{
   const V=RECS.filter(vig).sort((a,b)=>{const ka=claveCod(a),kb=claveCod(b);return tipoDe(a).localeCompare(tipoDe(b))||(kb.y-ka.y)||(ka.n-kb.n)});
   csv(`Expedientes_AC_OM_${hoyTxt()}.csv`,["N.° de registro","Tipo","Clasificación","Requisito ISO 21001","Proceso","Proveedor externo","Fuente","Familia de causa","Estado del expediente","Acciones","Implementadas","Pendientes","Responsable de la verificación","Fecha de verificación","Resultado de la eficacia","Fecha de cierre","Actualizado al"],
