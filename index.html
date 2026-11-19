@@ -357,7 +357,7 @@ footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
 <dialog id="dLogin" class="sm"><form id="fLogin" method="dialog">
   <div class="mh"><div><h2>Ingresar para editar</h2><div class="meta">Solo para usuarios registrados por los administradores. Para consultar no necesita ingresar.</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
   <div class="mb">
-    <p id="lInfo" class="admnote" style="margin:0 0 12px" hidden><b>Módulo de administración.</b> Ingrese con su correo y clave de administrador para entrar.</p>
+    <p id="lInfo" class="admnote" style="margin:0 0 12px" hidden><b>Módulo de administración.</b><br>• <b>Correo:</b> su correo institucional completo, por ejemplo <i>patrick.villanueva@urp.edu.pe</i> (no «admin»).<br>• <b>Clave:</b> la clave maestra que se guardó en el Apps Script con el nombre CLAVE_EDICION, o su clave personal si ya la creó en «Mi clave».</p>
     <div class="fi" style="margin-bottom:12px"><label for="lCorreo">Correo institucional</label><input id="lCorreo" type="email" autocomplete="email" required placeholder="nombre@urp.edu.pe"></div>
     <div class="fi"><label for="lClave">Su clave</label><div class="hl">La entrega un administrador. Puede cambiarla después en «Administración › Mi clave» si es administrador, o pedir que se la cambien. Se recuerda solo mientras esta pestaña esté abierta.</div><input id="lClave" type="password" autocomplete="current-password" required></div>
     <p id="lErr" class="late" style="margin-top:10px"></p>
