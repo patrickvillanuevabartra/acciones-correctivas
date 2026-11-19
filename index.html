@@ -400,11 +400,10 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
   </div>
   <div class="view" id="vAdm" hidden>
     <div class="urpbox" id="urpAdm"></div>
-    <p class="admnote"><b>Módulo de administración.</b> Solo lo ven los administradores: Patrick Villanueva y Patricia Vega, que son administradores fijos y no se pueden desactivar. Aquí se da o se quita el acceso para editar, se revisa quién hizo cada cambio y se descargan respaldos. Nada de lo que se hace aquí borra expedientes.</p>
+    <p class="admnote"><b>Módulo de administración.</b> Solo lo ven los administradores: Patrick Villanueva y Patricia Vega, que son administradores fijos y no se pueden desactivar. Aquí se da o se quita el acceso para editar y se descargan respaldos. Nada de lo que se hace aquí borra expedientes.</p>
     <div class="admnav">
       <button class="btn" data-go="aRoles">Roles y permisos</button>
       <button class="btn" data-go="aUsr">Usuarios</button>
-      <button class="btn" data-go="aLog">Bitácora de cambios</button>
       <button class="btn" data-go="aArch">Expedientes archivados</button>
       <button class="btn" data-go="aResp">Respaldos</button>
     </div>
@@ -412,7 +411,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
     <section class="admsec" id="aRoles">
       <h2>Roles y permisos</h2>
       <p class="pn">Qué puede hacer cada persona en el aplicativo. El rol se asigna en «Usuarios», aquí abajo.</p>
-      <div class="tw"><table class="roles"><thead><tr><th>Rol</th><th>Qué ve</th><th>Secciones del FR-007 que completa</th><th>Archivar, usuarios, bitácora y respaldos</th></tr></thead><tbody>
+      <div class="tw"><table class="roles"><thead><tr><th>Rol</th><th>Qué ve</th><th>Secciones del FR-007 que completa</th><th>Archivar, usuarios y respaldos</th></tr></thead><tbody>
         <tr><td><b>Administrador · Comité SGOE</b><br><span class="meta">Patrick Villanueva y Patricia Vega, fijos.</span></td><td class="si">✓ Todos</td><td>Todas. Registra el expediente (<b>1 y 2</b>), evalúa la eficacia (<b>7</b>, con apoyo de la IA) y lo cierra (<b>8</b>).</td><td class="si">✓</td></tr>
         <tr><td><b>Responsable de proceso</b> (editor)<br><span class="meta">Según los procesos que tenga asignados. Si un expediente tiene varios procesos, sus responsables lo completan en conjunto.</span></td><td class="si">✓ Los de sus procesos</td><td><b>3, 4 y 5</b>: corrección inmediata, análisis de causa raíz y plan de acción, con la evidencia de ejecución de cada actividad.</td><td class="no">✗</td></tr>
         <tr><td><b>Unidad de Calidad y Acreditación</b><br><span class="meta">Quien «verifica la implementación» y «coordina proveedores externos».</span></td><td class="si">✓ Todos</td><td><b>6</b> en todos los expedientes, con las evidencias de ejecución. Además <b>3, 4 y 5</b> de los expedientes con proveedor externo.</td><td class="no">✗</td></tr>
@@ -426,12 +425,6 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
       <div class="tw" id="uTabla"><div class="empty">Ingrese como administrador para ver los usuarios.</div></div>
     </section>
 
-    <section class="admsec" id="aLog">
-      <h2>Bitácora de cambios</h2>
-      <p class="pn">Registro automático de cada ingreso, expediente creado, editado, archivado o restaurado, y de los cambios de usuarios. No se puede modificar desde el aplicativo; sirve como evidencia ante una auditoría.</p>
-      <div class="tools"><input type="search" id="logQ" placeholder="Buscar por usuario, acción o código…" aria-label="Buscar en la bitácora"><button class="btn" id="logRecargar">↻ Volver a leer</button></div>
-      <div class="tw" id="logTabla"><div class="empty">Ingrese como administrador para ver la bitácora.</div></div>
-    </section>
 
     <section class="admsec" id="aArch">
       <h2>Expedientes archivados</h2>
@@ -461,7 +454,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
   <div class="mf"><button type="button" class="btn" data-close>Cancelar</button><button type="submit" class="btn pri" id="mcBtn">Guardar mi nueva clave</button></div>
 </form></dialog>
 <dialog id="dUser" class="sm"><form id="fUser" method="dialog">
-  <div class="mh"><div><h2 id="uTit">Agregar usuario</h2><div class="meta">Los cambios se guardan en QuintaDB y quedan en la bitácora.</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
+  <div class="mh"><div><h2 id="uTit">Agregar usuario</h2><div class="meta">Los cambios se guardan en QuintaDB.</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
   <div class="mb"><div class="fg" style="grid-template-columns:1fr">
     <div class="fi"><label for="uCorreo">Correo institucional <span class="req">*</span></label><div class="hl">Sirve como contacto y también para ingresar. No se puede cambiar después de creado.</div><input id="uCorreo" type="email" required placeholder="nombre@urp.edu.pe"></div>
     <div class="fi"><label for="uUsuario">Usuario</label><div class="hl">El nombre con el que ingresará: puede ser corto, como <i>horacio</i> o <i>pvega</i>, o <b>su correo completo</b> si lo prefiere. Sin espacios. Si lo deja en blanco, ingresa con su correo.</div><input id="uUsuario" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="60" pattern="[A-Za-z0-9áéíóúñüÁÉÍÓÚÑÜ._@\-]{3,60}" placeholder="por ejemplo: horacio  o  nombre@urp.edu.pe"><button type="button" class="btn" id="uUsarCorreo" style="margin-top:6px">Usar su correo como usuario</button></div>
@@ -1005,9 +998,9 @@ $("#bClave").onclick=()=>{$("#mc1").value=$("#mc2").value="";$("#mcErr").textCon
 let USERS=[],LOGS=[];
 async function admCargar(){
   if(!esAdmin()||MODO!=="vivo")return;
-  $("#uTabla").innerHTML='<div class="empty">Leyendo usuarios…</div>';$("#logTabla").innerHTML='<div class="empty">Leyendo bitácora…</div>';
-  try{const [u,l]=await Promise.all([post({action:"users_list"}),post({action:"log_list",limite:300})]);USERS=u.users||[];LOGS=l.log||[];pintarUsuarios();pintarLog();}
-  catch(err){$("#uTabla").innerHTML=`<div class="empty">No se pudo leer: ${esc(err.message)}</div>`;$("#logTabla").innerHTML="";}
+  $("#uTabla").innerHTML='<div class="empty">Leyendo usuarios…</div>';
+  try{const u=await post({action:"users_list"});USERS=u.users||[];pintarUsuarios();}
+  catch(err){$("#uTabla").innerHTML=`<div class="empty">No se pudo leer: ${esc(err.message)}</div>`;}
   pintarArchivados();
 }
 function pintarUsuarios(){
@@ -1020,13 +1013,6 @@ function pintarUsuarios(){
      <td>${esc(u.ultimo?u.ultimo.replace(/-/g,"/"):"Nunca")}</td>
      <td><button class="btn" data-ued="${esc(u.id)}">Editar</button></td></tr>`).join("")}</tbody></table>`:'<div class="empty">Aún no hay usuarios registrados.</div>';
   document.querySelectorAll("[data-ued]").forEach(b=>b.onclick=()=>abrirUsuario(USERS.find(x=>x.id===b.dataset.ued)));
-}
-function pintarLog(){
-  const q=($("#logQ").value||"").toLowerCase();
-  const L=LOGS.filter(x=>!q||JSON.stringify(x).toLowerCase().includes(q));
-  $("#logTabla").innerHTML=L.length?`<table><thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Acción</th><th>Expediente</th><th>Detalle</th></tr></thead><tbody>
-   ${L.map(x=>`<tr><td class="mono" style="white-space:nowrap">${esc(x.fecha.replace(/-/g,"/"))}</td><td>${esc(x.correo)}</td><td>${esc(x.accion)}</td><td class="code" style="font-size:13px">${esc(x.exp)}</td><td>${esc(x.detalle)}</td></tr>`).join("")}</tbody></table>`
-   :`<div class="empty">${LOGS.length?"Ningún registro coincide con la búsqueda.":"Todavía no hay registros. La bitácora empieza a llenarse desde que se instala esta versión."}</div>`;
 }
 function pintarArchivados(){
   const A=RECS.filter(d=>!vig(d)).sort((a,b)=>(a.v.codigo||"").localeCompare(b.v.codigo||""));
@@ -1069,8 +1055,7 @@ function mostrarAcceso(u){
   $("#accCopiar").onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("Mensaje copiado. Péguelo en el correo o WhatsApp de la persona.");}catch(e){const rg=document.createRange();rg.selectNodeContents($("#accTxt"));const sl=getSelection();sl.removeAllRanges();sl.addRange(rg);toast("Seleccioné el mensaje: cópielo con Ctrl + C.");}};
 }
 $("#uNuevo").onclick=()=>abrirUsuario(null);
-$("#uRecargar").onclick=$("#logRecargar").onclick=()=>admCargar();
-$("#logQ").oninput=()=>pintarLog();
+$("#uRecargar").onclick=()=>admCargar();
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>$("#"+b.dataset.go).scrollIntoView({behavior:"smooth",block:"start"}));
 $("#fMiClave").addEventListener("submit",async e=>{
   e.preventDefault();const a=$("#mc1").value,b=$("#mc2").value;$("#mcErr").textContent="";
@@ -1108,7 +1093,7 @@ function urpBurbuja(texto){
 }
 function urpGuias(){
   const e=$("#urpExp");if(e)e.innerHTML=urpBurbuja("¡Hola! Soy <b>Urpito</b>, del <b>SGOE FI URP</b> 😊 Aquí ves en qué etapa está cada expediente. Pulsa una etapa para ver solo esos, o baja a la lista y pulsa <b>Ver detalle</b> para leer uno completo. Los números y las fechas los encuentras en la pestaña <b>Indicadores y fechas</b>.");
-  const a=$("#urpAdm");if(a)a.innerHTML=urpBurbuja("Aquí das o quitas el permiso para editar. Para que alguien nuevo pueda editar: pulsa <b>Agregar usuario</b>, escribe su correo y su nombre, pulsa <b>Generar</b> para crear su clave y entrégasela en privado. Todo lo que se hace queda anotado en la <b>Bitácora</b>.");
+  const a=$("#urpAdm");if(a)a.innerHTML=urpBurbuja("Aquí das o quitas el permiso para editar. Para que alguien nuevo pueda editar: pulsa <b>Agregar usuario</b>, escribe su correo y su nombre, pulsa <b>Generar</b> para crear su clave y entrégasela en privado.");
   const f=$("#urpEdit");if(f)f.innerHTML=urpBurbuja(esAdmin()?"Te acompaño 😊 Las secciones son las mismas del formato <b>FI-GCA-FR-007</b>. Cada una indica, en su etiqueta de color, quién la completa: el <b>Comité SGOE</b> (1, 2, 7 y 8), el <b>responsable del proceso</b> (3, 4 y 5) y la <b>Unidad de Calidad y Acreditación</b> (6). En la sección 7 puedes pedirme una sugerencia de criterio de eficacia con IA ✨.":
     (SES&&SES.verifica&&!esResp(EDIT&&EDIT.id?RECS.find(x=>x.id===EDIT.id):null)?"Te acompaño 😊 A ti te toca la <b>sección 6, Verificación de la implementación</b>. Revisa en el plan de acción (sección 5) la <b>evidencia de ejecución</b> de cada actividad; si todas están implementadas y con evidencia, marca «Conforme». Las demás secciones las ves en modo de solo lectura 🔒.":
     "Te acompaño 😊 A ti te tocan las <b>secciones 3, 4 y 5</b>: la corrección inmediata, el análisis de causa raíz con los 5 Porqués y el plan de acción. Cuando una actividad esté hecha, márcala «Implementado» y pega el <b>enlace a su evidencia</b>. Las demás secciones las completan el Comité SGOE o la Unidad de Calidad; las ves en modo de solo lectura 🔒."));
