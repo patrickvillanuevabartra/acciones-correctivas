@@ -336,8 +336,6 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
       <button class="hb solid" id="bNuevo">＋ Nuevo expediente</button>
       <button class="hb" id="bClave" title="Cambiar su clave personal">🔑 Cambiar mi clave</button>
       <button class="hb" id="bLogin">Salir</button>
-      <button class="hb" id="bReload" title="Volver a leer los datos de QuintaDB">↻ Actualizar</button>
-      <button class="hb" id="bTheme" title="Cambiar entre fondo claro y oscuro">◐ Tema</button>
     </div>
   </div>
   <div id="banner"></div>
@@ -1121,9 +1119,12 @@ window.urpTrasAlternar=urpGuias;
 document.addEventListener("click",e=>{if(e.target.matches("[data-close]"))e.target.closest("dialog").close();});
 document.querySelectorAll("dialog").forEach(d=>d.addEventListener("click",e=>{if(e.target===d&&d.id!=="dEdit")d.close()}));
 $("#bNuevo").onclick=()=>editar(null);
-$("#bReload").onclick=()=>cargar();
-$("#bTheme").onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark";try{localStorage.setItem("acom-theme",r.dataset.theme)}catch(e){}};
-try{const t=localStorage.getItem("acom-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+try{localStorage.removeItem("acom-theme")}catch(e){}   // el tema sigue al del equipo, como en los demás aplicativos
+/* Datos siempre al día, sin botón: al volver a la pestaña y cada 5 minutos (nunca mientras se edita) */
+let ULT_CARGA=Date.now();
+function refrescarSiConviene(){if(!SES||document.hidden||document.querySelector("dialog[open]"))return;if(Date.now()-ULT_CARGA<60000)return;ULT_CARGA=Date.now();cargar();}
+document.addEventListener("visibilitychange",refrescarSiConviene);
+setInterval(()=>{ULT_CARGA=0;refrescarSiConviene();},5*60*1000);
 EST.forEach(([e,,l])=>$("#fEst").insertAdjacentHTML("beforeend",`<option value="${esc(e)}">${l}</option>`));
 Object.entries(FAM).forEach(([k,l])=>$("#fFam").insertAdjacentHTML("beforeend",`<option value="${k}">${l}</option>`));
 $("#fEst").onchange=e=>{FL.e=e.target.value;pintar()};$("#fFam").onchange=e=>{FL.f=e.target.value;pintar()};
