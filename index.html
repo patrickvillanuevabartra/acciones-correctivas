@@ -466,7 +466,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
   <div class="mh"><div><h2 id="uTit">Agregar usuario</h2><div class="meta">Los cambios se guardan en QuintaDB y quedan en la bitácora.</div></div><button type="button" class="x" data-close aria-label="Cerrar">×</button></div>
   <div class="mb"><div class="fg" style="grid-template-columns:1fr">
     <div class="fi"><label for="uCorreo">Correo institucional <span class="req">*</span></label><div class="hl">Sirve como contacto y también para ingresar. No se puede cambiar después de creado.</div><input id="uCorreo" type="email" required placeholder="nombre@urp.edu.pe"></div>
-    <div class="fi"><label for="uUsuario">Usuario</label><div class="hl">El nombre con el que ingresará, por ejemplo <i>horacio</i> o <i>pvega</i>: de 3 a 30 letras o números, sin espacios. Si lo deja en blanco, ingresa con su correo.</div><input id="uUsuario" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="30" pattern="[A-Za-z0-9áéíóúñüÁÉÍÓÚÑÜ._\-]{3,30}" placeholder="por ejemplo: horacio"></div>
+    <div class="fi"><label for="uUsuario">Usuario</label><div class="hl">El nombre con el que ingresará: puede ser corto, como <i>horacio</i> o <i>pvega</i>, o <b>su correo completo</b> si lo prefiere. Sin espacios. Si lo deja en blanco, ingresa con su correo.</div><input id="uUsuario" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="60" pattern="[A-Za-z0-9áéíóúñüÁÉÍÓÚÑÜ._@\-]{3,60}" placeholder="por ejemplo: horacio  o  nombre@urp.edu.pe"><button type="button" class="btn" id="uUsarCorreo" style="margin-top:6px">Usar su correo como usuario</button></div>
     <div class="fi"><label for="uNombre">Nombre completo <span class="req">*</span></label><input id="uNombre" required></div>
     <div class="fi"><label for="uCargo">Cargo o unidad</label><div class="hl">Por ejemplo: Director de la Escuela de Ingeniería Civil, Comité SGOE.</div><input id="uCargo"></div>
     <div class="fi" id="uProcWrap"><label>Procesos a su cargo</label><div class="hl">Marque los procesos de nivel 0 de los que es responsable. Podrá registrar y editar los expedientes en los que figure alguno de ellos.</div><div class="plist" id="uProc"></div>
@@ -1055,6 +1055,7 @@ function abrirUsuario(u){
   $("#uErr").textContent=fijo?"Administrador fijo: siempre está activo y con rol de administrador.":"";
   $("#dUser").showModal();
 }
+$("#uUsarCorreo").onclick=()=>{const c=$("#uCorreo").value.trim().toLowerCase();if(!c){toast("Primero escriba el correo.",1);return;}$("#uUsuario").value=c;};
 $("#uGen").onclick=()=>{const a="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";const r=new Uint32Array(10);crypto.getRandomValues(r);r.forEach(n=>s+=a[n%a.length]);$("#uClave").value=s;$("#uClave").select();};
 $("#fUser").addEventListener("submit",async e=>{
   e.preventDefault();const b=$("#uBtn");b.disabled=true;$("#uErr").textContent="";
