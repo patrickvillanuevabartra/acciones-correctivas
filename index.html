@@ -207,7 +207,16 @@ th{font-size:13px;color:var(--muted);font-weight:600}
 footer{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 16px}
 
 
-/* procesos (cascada del inventario) */
+/* procesos (lista de elección múltiple del inventario) */
+.plist{border:1px solid var(--line);border-radius:12px;padding:6px 12px 10px;background:var(--card)}
+.plist .pt{font-weight:700;color:var(--brand);margin:12px 0 4px;font-size:13.5px;text-transform:uppercase;letter-spacing:.03em}
+.plist label{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-radius:8px;cursor:pointer;font-weight:400;margin:0}
+.plist label:hover{background:var(--note-bg)}.plist label.on{background:var(--brand-l);font-weight:600}
+.plist input[type=checkbox]{width:20px;height:20px;flex:0 0 auto;margin-top:2px;accent-color:#0f8f5e}
+.p1s{margin:2px 0 6px 32px;border-left:3px solid var(--line);padding-left:8px}.p1h{font-size:13px;color:var(--muted);margin:2px 0}
+.p1 span{font-size:14.5px}
+.psum{margin-top:10px;font-size:14.5px;background:var(--note-bg);border-radius:8px;padding:8px 12px}
+
 #procBox{display:flex;flex-direction:column;gap:12px;margin-bottom:10px}
 .procrow{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--note-bg)}
 .procrow .ph{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:6px}
@@ -687,7 +696,7 @@ const SECS=[
   {k:"fuente",l:"Origen del hallazgo",ty:"sel",o:"fuente",h:"Dónde se detectó: auditoría, revisión por la dirección, Comité SGOE, quejas, etc."},
   {k:"clasif",l:"Clasificación",ty:"sel",o:"clasif",h:"No conformidad: incumple un requisito. Menor: incumplimiento puntual que no afecta al sistema completo."},
   {k:"requisito",l:"Requisito de la norma",h:"Numeral de la ISO 21001 relacionado. Ejemplo: 7.5.3 de ISO 21001:2018."},
-  {k:"proceso",l:"Proceso involucrado",full:1,ty:"proc",h:"Elija el proceso del inventario de procesos, nivel por nivel, como en los demás aplicativos. Basta llegar hasta el nivel que corresponda (por lo general, el nivel 2). Si el hallazgo abarca varios procesos, pulse «Agregar otro proceso»."},
+  {k:"proceso",l:"Proceso involucrado",full:1,ty:"proc",h:"Marque uno o varios procesos de nivel 0 del inventario de procesos. Si desea precisar, al marcar uno aparecen debajo sus procesos de nivel 1: marque los que correspondan (es opcional)."},
   {k:"familia",l:"Tipo de causa",ty:"sel",o:"familia",only:"AC",h:"Agrupa hallazgos con causas parecidas para detectar problemas que se repiten."},
   {k:"generado",l:"Detectado por",h:"Persona o instancia que identificó el hallazgo (auditor, Comité SGOE…)."},
   {k:"aceptado",l:"Aceptado por",h:"Responsable que acepta el hallazgo y se compromete a atenderlo."}]},
@@ -734,7 +743,7 @@ function campo(fd,v){
   if(fd.ty==="sel")inp=`<select id="${id}" name="${fd.k}"${fd.req?" required":""}><option value="">— Seleccione —</option>${OPT[fd.o].map(o=>`<option${o===val?" selected":""}>${esc(o)}</option>`).join("")}${val&&!OPT[fd.o].includes(val)?`<option selected>${esc(val)}</option>`:""}</select>`;
   else if(fd.ty==="area")inp=`<textarea id="${id}" name="${fd.k}" rows="${fd.rows||3}"${fd.req?" required":""}>${esc(val)}</textarea>`;
   else if(fd.ty==="date")inp=`<input type="date" id="${id}" name="${fd.k}" value="${toISO(val)}">`;
-  else if(fd.ty==="proc")inp=`<input type="hidden" id="${id}" name="${fd.k}" value="${esc(val)}"><div id="procBox"></div><button type="button" class="btn" id="addProc">＋ Agregar otro proceso</button>`;
+  else if(fd.ty==="proc")inp=`<input type="hidden" id="${id}" name="${fd.k}" value="${esc(val)}"><div id="procBox"></div>`;
   else inp=`<input id="${id}" name="${fd.k}" value="${esc(val)}"${fd.req?" required":""}>`;
   return `<div class="fi${fd.full?" full":""}" data-only="${fd.only||""}"><label for="${id}">${fd.l}${fd.req?' <span class="req">*</span>':""}</label>${fd.h?`<div class="hl">${fd.h}</div>`:""}${inp}</div>`;
 }
@@ -805,21 +814,28 @@ function rutaDeTexto(t){if(t.includes("›"))return t;const cod=(t.match(/^[EMS]
 function procCorto(t){const L=rutasTxt(t);if(!L.length)return "";return L.map(x=>{const r=rutaDeTexto(x);return r?segsDe(r).slice(-1)[0]:x}).join(" · ");}
 function procDetalle(t){const L=rutasTxt(t);if(!L.length)return "";
   return `<div class="procdet"><span>Proceso${L.length>1?"s":""} involucrado${L.length>1?"s":""} (ruta en el inventario)</span>${L.map(x=>{const r=rutaDeTexto(x);return `<div>${r?segsDe(r).map((g,i,a)=>i===a.length-1?`<b>${esc(g)}</b>`:esc(g)).join(' <i>›</i> '):esc(x)}</div>`}).join("")}</div>`;}
-let PROCS=[];
-function procIniciar(t){PROCS=rutasTxt(t).map(x=>{const r=rutaDeTexto(x);return r?{segs:segsDe(r),prev:""}:{segs:[],prev:x}});if(!PROCS.length)PROCS=[{segs:[],prev:""}];procPintar();
-  $("#addProc").onclick=()=>{PROCS.push({segs:[],prev:""});procPintar();const s=document.querySelectorAll("#procBox .procrow");s[s.length-1].querySelector("select").focus();};}
+let PSEL=new Map(),PPREV=[];   // clave «Tipo › Nivel 0» → conjunto de procesos de nivel 1 marcados
+function procIniciar(t){PSEL=new Map();PPREV=[];
+  rutasTxt(t).forEach(x=>{const r=rutaDeTexto(x);if(!r){PPREV.push(x);return;}const g=segsDe(r);if(g.length<2){PPREV.push(x);return;}
+    const k=g[0]+" › "+g[1];if(!PSEL.has(k))PSEL.set(k,new Set());if(g.length>=3)PSEL.get(k).add(g[2]);});
+  procPintar();}
 function procPintar(){
-  $("#procBox").innerHTML=PROCS.map((p,k)=>{let h="";for(let i=0;i<NIVELES.length;i++){const op=hijosProc(p.segs.slice(0,i));if(!op.length)break;
-      h+=`<div class="fi"><label>${NIVELES[i]}${i===0?' <span class="req">*</span>':""}</label><select data-p="${k}" data-n="${i}"><option value="">${i===0?"— Seleccione —":"— (no es necesario bajar más) —"}</option>${op.map(o=>`<option${o===p.segs[i]?" selected":""}>${esc(o)}</option>`).join("")}</select></div>`;
-      if(!p.segs[i])break;}
-    return `<div class="procrow"><div class="ph"><span>Proceso ${PROCS.length>1?k+1:""}</span>${PROCS.length>1?`<button type="button" class="btn dan" data-prm="${k}">Quitar</button>`:""}</div>
-      ${p.prev&&!p.segs.length?`<div class="hl">Texto anterior: «${esc(p.prev)}». Elija el proceso en las listas para reemplazarlo; si no elige nada, se conserva.</div>`:""}
-      <div class="fg">${h}</div>${p.segs.length?`<div class="ruta">Ruta: ${p.segs.map(esc).join(" › ")}</div>`:""}</div>`}).join("");
-  document.querySelectorAll("#procBox select").forEach(el=>el.onchange=()=>{const p=PROCS[+el.dataset.p],i=+el.dataset.n;p.segs=p.segs.slice(0,i);if(el.value)p.segs.push(el.value);procPintar();
-    const nx=document.querySelector(`#procBox select[data-p="${el.dataset.p}"][data-n="${i+1}"]`);if(nx)nx.focus();});
-  document.querySelectorAll("#procBox [data-prm]").forEach(b=>b.onclick=()=>{PROCS.splice(+b.dataset.prm,1);procPintar();});
+  let h=PPREV.length&&!PSEL.size?`<div class="hl">Texto anterior: «${esc(PPREV.join(" ; "))}». Marque los procesos para reemplazarlo; si no marca nada, se conserva.</div>`:"";
+  h+='<div class="plist">'+hijosProc([]).map(t=>`<div class="pt">${esc(t)}</div>`+hijosProc([t]).map(n0=>{const k=t+" › "+n0,on=PSEL.has(k);
+      return `<label class="p0${on?" on":""}"><input type="checkbox" data-k="${esc(k)}"${on?" checked":""}> <span>${esc(n0)}</span></label>`+
+        (on?`<div class="p1s"><div class="p1h">Si desea, precise el nivel 1:</div>${hijosProc([t,n0]).map(n1=>`<label class="p1"><input type="checkbox" data-k="${esc(k)}" data-n1="${esc(n1)}"${PSEL.get(k).has(n1)?" checked":""}> <span>${esc(n1)}</span></label>`).join("")}</div>`:"");}).join("")).join("")+'</div>';
+  const sel=procElegidos();
+  h+=`<div class="psum"><b>Seleccionado${sel.length>1?"s":""}:</b> ${sel.length?sel.map(x=>esc(segsDe(x).slice(-1)[0])).join(" · "):"ninguno todavía"}</div>`;
+  $("#procBox").innerHTML=h;
+  document.querySelectorAll("#procBox input[type=checkbox]").forEach(cb=>cb.onchange=()=>{const k=cb.dataset.k;
+    if(cb.dataset.n1){const st=PSEL.get(k);cb.checked?st.add(cb.dataset.n1):st.delete(cb.dataset.n1);}
+    else if(cb.checked)PSEL.set(k,new Set());else PSEL.delete(k);
+    const y=$("#eb").scrollTop;procPintar();$("#eb").scrollTop=y;});
 }
-function procSync(){const el=$("#e_proceso");if(!el)return;el.value=PROCS.map(p=>p.segs.length?p.segs.join(" › "):p.prev).filter(Boolean).join(PSEP);}
+function procElegidos(){const out=[];
+  hijosProc([]).forEach(t=>hijosProc([t]).forEach(n0=>{const k=t+" › "+n0;if(!PSEL.has(k))return;const st=PSEL.get(k);
+    if(!st.size)out.push(k);else hijosProc([t,n0]).forEach(n1=>{if(st.has(n1))out.push(k+" › "+n1)});}));return out;}
+function procSync(){const el=$("#e_proceso");if(!el)return;const L=procElegidos();el.value=(L.length?L:PPREV).join(PSEP);}
 async function cargarInventario(){try{const r=await fetch(proxy+(proxy.includes("?")?"&":"?")+"action=inventario");const j=await r.json();if(j.ok&&j.rutas&&j.rutas.length>50)RUTAS=j.rutas;}catch(e){}}
 
 /* ═══════════ sesión ═══════════ */
