@@ -488,12 +488,12 @@ const EST=[
 ];
 const OPT={
  tipo:["Acción correctiva","Oportunidad de mejora"],
- fuente:["Auditoria interna","Auditoria externa","Revisión del SGOE por la dirección","Verificación del Comité SGOE","Identificado por el Comité SGOE","Actividades diarias","Revisión del sistema","Quejas de los clientes","Incidente o accidente","Consejos consultivos","Salida no conforme","Otro"],
+ fuente:["Auditoría interna","Auditoría externa","Revisión por la dirección","Seguimiento de indicadores","Queja o reclamo","Reunión de dueños de proceso","Verificación del Comité SGOE","Otra"],
  clasif:["No conformidad","No conformidad mayor","No conformidad menor","Observación","Oportunidad de mejora"],
  metodo:["5 Porqués","Ishikawa","5 Porqués e Ishikawa","Otra"],
  familia:Object.values(FAM),
  siNo:["Sí","No aplica"],
- resVerif:["Implementado","En proceso","No implementado","Parcial - acciones implementadas y acciones pendientes","Pendiente - plan de acción por iniciar"],
+ resVerif:["Conforme - acciones implementadas","No conforme - acciones pendientes"],
  resEf:["Eficaz","No eficaz","Pendiente - evaluación programada"],
  resCierre:["Conforme - acciones implementadas","No conforme - acciones pendientes"],
  estado:EST.map(e=>e[0]),
@@ -700,7 +700,7 @@ const SECS=[
   {k:"clasif",l:"Clasificación",ty:"sel",o:"clasif",h:"No conformidad: incumple un requisito (mayor o menor según su alcance). Observación u oportunidad de mejora: no hay incumplimiento. <b>La clasificación la determina el Comité SGOE conforme al FI-GCA-PR-003</b>; si el informe de auditoría solo indica «NC», sin distinguir mayor o menor, la precisa el Comité."},
   {k:"proceso",l:"Proceso",full:1,ty:"proc",h:"Marque uno o varios procesos de nivel 0 del inventario de procesos. Si desea precisar, al marcar uno aparecen debajo sus procesos de nivel 1: marque los que correspondan (es opcional)."},
   {k:"provext",l:"Proveedor(es) externo(s) involucrado(s)",full:1,ty:"provext",h:"Solo si en el hallazgo interviene un órgano central de la URP que provee un proceso, producto o servicio a la Facultad, según la <b>Matriz de Proveedores Externos al SGOE (FI-GCA-MT-006)</b>. Al marcarlo, la Unidad de Calidad y Acreditación también podrá completar el expediente. Si no interviene ninguno, déjelo en blanco."},
-  {k:"fuente",l:"Fuente del hallazgo",ty:"sel",o:"fuente",h:"De dónde proviene el hallazgo: auditoría interna, revisión por la dirección, Comité SGOE, quejas, etc."},
+  {k:"fuente",l:"Fuente del hallazgo",ty:"sel",o:"fuente",h:"De dónde proviene el hallazgo: auditoría interna o externa, revisión por la dirección, seguimiento de indicadores, queja o reclamo, reunión de dueños de proceso, verificación del Comité SGOE u otra."},
   {k:"requisito",l:"Requisito ISO 21001:2018",h:"Numeral de la norma relacionado. Ejemplo: 7.5.3 de ISO 21001:2018."},
   {k:"generado",l:"Generado por (nombre y cargo)",h:"Persona que identificó el hallazgo (auditor, Comité SGOE…)."},
   {k:"aceptado",l:"Aceptado por (nombre y cargo)",h:"Responsable que acepta el hallazgo y se compromete a atenderlo."},
@@ -723,7 +723,7 @@ const SECS=[
  {t:"6. Verificación de la implementación",i:"Se completa después de ejecutado el plan: se comprueba que las actividades se hicieron.",f:[
   {k:"respVerif",l:"Responsable de la verificación",h:"Quién comprueba (normalmente la Unidad de Calidad y Acreditación o el Comité SGOE)."},
   {k:"fVerif",l:"Fecha de verificación",ty:"date",h:"Día en que se comprobó la ejecución de las actividades."},
-  {k:"resVerif",l:"Resultado",ty:"sel",o:"resVerif",h:"Verificación de que las acciones se ejecutaron: ¿se cumplieron las actividades del plan?"},
+  {k:"resVerif",l:"Resultado",ty:"sel",o:"resVerif",h:"Verificación de que las acciones se ejecutaron. Conforme: todas las actividades del plan se implementaron. No conforme: quedan actividades pendientes. Déjelo en blanco hasta que se haga la verificación."},
   {k:"obsVerif",l:"Observaciones",ty:"area",full:1,h:"Cambios al plan, hallazgos relacionados u otras precisiones."}]},
  {t:"7. Evaluación de la eficacia",i:"Se comprueba que las actividades realmente resolvieron el problema o lograron la mejora.",f:[
   {k:"criterio",l:"Criterio de eficacia (cómo se comprobará)",ty:"area",full:1,h:"Qué evidencia demostrará que el problema no se repite o que la mejora se logró."},
