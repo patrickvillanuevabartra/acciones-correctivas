@@ -144,6 +144,36 @@ label.chk input{width:auto}
 .grp h3{display:flex;align-items:baseline;gap:10px;margin:0 0 8px;font-size:16px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
 .grp h3 span{font-size:14px;font-weight:400;color:var(--muted)}
 .row{display:grid;grid-template-columns:150px minmax(0,1fr) 180px 170px auto;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+/* tarjetas de expediente (v2) */
+.cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:14px}
+@media (max-width:760px){.cards2{grid-template-columns:1fr}}
+.card2{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.card2.arch{opacity:.65}
+.c2top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.c2id{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.c2code{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:21px;margin-right:4px;white-space:nowrap}
+.c2code.sm{font-size:15px}
+.tag.ISO{background:var(--brand-l);color:var(--brand-d)}.tag.EXT{background:#fff1d6;color:#8a5200}
+.pill{display:inline-block;color:#fff;font-weight:700;font-size:14.5px;padding:5px 12px;border-radius:999px;white-space:nowrap}
+.pill.sm{font-size:13px;padding:2px 10px}
+.c2proc{font-weight:600;font-size:15px;color:var(--slate)}
+.c2desc{font-size:15px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.c2steps{list-style:none;margin:6px 0 2px;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.c2steps li{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);text-align:center}
+.c2steps li i{display:block;height:7px;border-radius:999px;background:var(--line)}
+.c2steps li.done i{background:var(--ok)}.c2steps li.done{color:var(--ink)}
+.c2steps li.cur i{background:var(--c)}.c2steps li.cur{color:var(--ink);font-weight:700}
+.c2foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;border-top:1px dashed var(--line);padding-top:10px;margin-top:auto}
+.c2prog{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);flex:1 1 220px}
+.c2prog .track{width:110px;height:8px;flex:none}
+.vence{background:#fde8e8;color:#a61b1b;font-weight:700;font-size:13px;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.c2toca{flex:1 1 100%;font-size:14.5px;background:var(--note-bg);border-radius:8px;padding:6px 10px}
+.c2foot .cbtns{margin-left:auto}
+details.cerr{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+details.cerr summary{cursor:pointer;padding:10px 14px;font-weight:600;color:var(--brand-d);font-size:15px}
+.cerr-row{display:grid;grid-template-columns:150px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 14px;border-top:1px solid var(--line)}
+.cerr-proc{font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:760px){.cerr-row{grid-template-columns:1fr auto}.cerr-proc{display:none}}
 .row.arch{opacity:.65}
 .code{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15.5px;white-space:nowrap}
 .tag{display:inline-block;font-size:12.5px;padding:1px 8px;border-radius:999px;font-weight:600;margin-top:4px;white-space:nowrap}
@@ -645,21 +675,47 @@ function filtrados(){
   return RECS.filter(d=>(FL.arch||vig(d))&&(!FL.t||tipoDe(d)===FL.t)&&(!FL.e||d.v.estado===FL.e)&&(!FL.f||famDe(d)===FL.f)&&(!FL.q||JSON.stringify(d).toLowerCase().includes(FL.q)))
    .sort((a,b)=>{const ka=claveCod(a),kb=claveCod(b);return tipoDe(a).localeCompare(tipoDe(b))||(kb.y-ka.y)||(ka.n-kb.n)||(a.v.codigo||"").localeCompare(b.v.codigo||"")});
 }
+const ETAPAS=["Análisis de causa","Plan de acción","Ejecución","Eficacia","Cierre"];
+function etapaIdx(e){e=e||"";if(e.startsWith("Cerrada"))return 5;if(e.startsWith("Acciones implementadas"))return 3;if(e.includes("ejecución"))return 2;if(e.includes("por aprobar"))return 1;return 0;}
+function leToca(d,venc){const e=d.v.estado||"";
+  if(e.startsWith("Cerrada"))return "";
+  if(e.startsWith("Acciones implementadas"))return "<b>Comité SGOE:</b> verificar y evaluar la eficacia";
+  if(e.includes("ejecución"))return venc?`<b>Responsable del proceso:</b> ponerse al día con ${venc} actividad${venc>1?"es":""} vencida${venc>1?"s":""}`:"<b>Responsable del proceso:</b> ejecutar las actividades y subir evidencias";
+  if(e.includes("por aprobar"))return "<b>Comité SGOE:</b> revisar y aprobar el plan de acción";
+  return "<b>Responsable del proceso:</b> analizar la causa y proponer el plan";}
 function fila(d){
   const n=d.acts.length,i=d.acts.filter(a=>actEst(a)===I).length,p=d.acts.filter(a=>actEst(a)===P).length;const t=tipoDe(d);
-  return `<article class="row ${vig(d)?"":"arch"}" style="--c:${vig(d)?estColor(d.v.estado):"var(--gray)"}">
-    <div><div class="code">${esc(d.v.codigo||"(sin código)")}</div>${vig(d)?`<span class="tag ${t}">${t==="AC"?esc(d.v.clasif||"Acción correctiva"):"Oportunidad de mejora"}</span>`:'<span class="tag ARCH">Archivado</span>'}</div>
-    <div><div class="pr">${esc(procCorto(d.v.proceso))}${d.v.requisito?", ISO "+esc(d.v.requisito.replace(/ de ISO 21001:2018/,"")):""}</div><div class="d">${esc(desc(d))}</div></div>
-    <div class="st"><span class="dot" style="background:${estColor(d.v.estado)}"></span>${esc(estShort(d.v.estado))}</div>
-    <div class="prog">${n?`<div class="track"><i style="width:${i/n*100}%;background:var(--ok)"></i><i style="width:${p/n*100}%;background:var(--wait)"></i></div>${i} de ${n} actividades hechas`:"Sin plan de acción"}</div>
-    <div class="cbtns"><button class="btn" data-ver="${esc(d.id)}">Ver detalle</button>${vig(d)&&puedeEditar(d)?`<button class="btn" data-ed="${esc(d.id)}">Editar</button>`:""}</div>
+  const venc=d.acts.filter(a=>actEst(a)!==I&&pd(a.prog)&&pd(a.prog)<HOY).length;
+  const col=vig(d)?estColor(d.v.estado):"var(--gray)",st=etapaIdx(d.v.estado),toca=vig(d)?leToca(d,venc):"";
+  const req=d.v.requisito?d.v.requisito.replace(/ de ISO 21001:2018/,""):"";
+  return `<article class="card2 ${vig(d)?"":"arch"}" style="--c:${col}">
+    <div class="c2top">
+      <div class="c2id"><div class="c2code">${esc(d.v.codigo||"(sin código)")}</div>
+        ${vig(d)?`<span class="tag ${t}">${t==="AC"?esc(d.v.clasif||"Acción correctiva"):"Oportunidad de mejora"}</span>`:'<span class="tag ARCH">Archivado</span>'}
+        ${req?`<span class="tag ISO">ISO ${esc(req)}</span>`:""}${d.v.provext?'<span class="tag EXT">Proveedor externo</span>':""}</div>
+      <div class="c2est"><span class="pill" style="background:${col}">${esc(estShort(d.v.estado))}</span></div>
+    </div>
+    <div class="c2proc">${esc(procCorto(d.v.proceso))}</div>
+    <div class="c2desc">${esc(desc(d))}</div>
+    <ol class="c2steps" aria-label="Etapa del expediente">${ETAPAS.map((l,k)=>`<li class="${k<st?"done":k===st?"cur":""}"><i></i><span>${l}</span></li>`).join("")}</ol>
+    <div class="c2foot">
+      <div class="c2prog">${n?`<div class="track"><i style="width:${i/n*100}%;background:var(--ok)"></i><i style="width:${p/n*100}%;background:var(--wait)"></i></div><span><b>${i} de ${n}</b> actividades hechas</span>`:'<span>Aún sin plan de acción</span>'}${venc?`<span class="vence">⚠ ${venc} vencida${venc>1?"s":""}</span>`:""}</div>
+      ${toca?`<div class="c2toca">👉 Le toca a ${toca}</div>`:""}
+      <div class="cbtns"><button class="btn" data-ver="${esc(d.id)}">Ver detalle</button>${vig(d)&&puedeEditar(d)?`<button class="btn pri" data-ed="${esc(d.id)}">Editar</button>`:""}</div>
+    </div>
   </article>`;
 }
+function filaCerrada(d){const ok=d.v.estado==="Cerrada - eficaz";
+  return `<div class="cerr-row"><span class="c2code sm">${esc(d.v.codigo||"")}</span><span class="cerr-proc">${esc(procCorto(d.v.proceso))}</span><span class="pill sm" style="background:${estColor(d.v.estado)}">${ok?"✓ ":""}${esc(estShort(d.v.estado))}</span><button class="btn" data-ver="${esc(d.id)}">Ver detalle</button></div>`;}
 function tarjetas(){
   const L=filtrados();const fil=FL.t||FL.e||FL.f||FL.q;
-  $("#count").textContent=`${L.length} expediente${L.length===1?"":"s"}${fil?" con los filtros elegidos":""}, ordenados por año y número`;
+  $("#count").textContent=`${L.length} expediente${L.length===1?"":"s"}${fil?" con los filtros elegidos":""}. Primero los que necesitan atención; los cerrados, al final de cada grupo`;
   const grupos=[];L.forEach(d=>{const t=tipoDe(d),y=claveCod(d).y;const k=t+y;let g=grupos.find(x=>x.k===k);if(!g){g={k,t,y,items:[]};grupos.push(g)}g.items.push(d)});
-  $("#cards").innerHTML=grupos.map(g=>`<section class="grp"><h3>${g.t==="AC"?"Acciones correctivas":"Oportunidades de mejora"} de ${g.y||"año sin registrar"}<span>${g.items.length} expediente${g.items.length===1?"":"s"}</span></h3>${g.items.map(fila).join("")}</section>`).join("")
+  $("#cards").innerHTML=grupos.map(g=>{const ab=g.items.filter(d=>!vig(d)||!String(d.v.estado||"").startsWith("Cerrada")),ce=g.items.filter(d=>vig(d)&&String(d.v.estado||"").startsWith("Cerrada"));
+    ab.sort((a,b)=>etapaIdx(a.v.estado)-etapaIdx(b.v.estado)||claveCod(a).n-claveCod(b).n);
+    return `<section class="grp"><h3>${g.t==="AC"?"Acciones correctivas":"Oportunidades de mejora"} de ${g.y||"año sin registrar"}<span>${ab.length} en curso${ce.length?` · ${ce.length} cerrado${ce.length>1?"s":""}`:""}</span></h3>
+    ${ab.length?`<div class="cards2">${ab.map(fila).join("")}</div>`:'<p class="meta">Todos los expedientes de este grupo están cerrados.</p>'}
+    ${ce.length?`<details class="cerr"><summary>Ver ${ce.length} expediente${ce.length>1?"s":""} cerrado${ce.length>1?"s":""}</summary>${ce.map(filaCerrada).join("")}</details>`:""}</section>`;}).join("")
     ||`<div class="empty">No hay expedientes con esos filtros. ${fil?'<button class="btn" id="limpiar">Quitar filtros</button>':""}</div>`;
   document.querySelectorAll("[data-ver]").forEach(b=>b.onclick=()=>verDetalle(b.dataset.ver));
   document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>editar(b.dataset.ed));
