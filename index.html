@@ -411,9 +411,9 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
       <h2>Roles y permisos</h2>
       <p class="pn">Qué puede hacer cada persona en el aplicativo. El rol se asigna en «Usuarios», aquí abajo.</p>
       <div class="tw"><table class="roles"><thead><tr><th>Rol</th><th>Qué ve</th><th>Secciones del FR-007 que completa</th><th>Archivar, usuarios y respaldos</th></tr></thead><tbody>
-        <tr><td><b>Administrador · Comité SGOE</b><br><span class="meta">Patrick Villanueva y Patricia Vega, fijos.</span></td><td class="si">✓ Todos</td><td>Todas. Registra el expediente (<b>1 y 2</b>), evalúa la eficacia (<b>7</b>, con apoyo de la IA) y lo cierra (<b>8</b>).</td><td class="si">✓</td></tr>
+        <tr><td><b>Administrador · Comité SGOE</b><br><span class="meta">Patrick Villanueva y Patricia Vega, fijos.</span></td><td class="si">✓ Todos</td><td>Todas. Registra el expediente (<b>1 y 2</b>), verifica la implementación (<b>6</b>, como responsable de la verificación), evalúa la eficacia (<b>7</b>, con apoyo de la IA) y lo cierra (<b>8</b>).</td><td class="si">✓</td></tr>
         <tr><td><b>Responsable de proceso</b> (editor)<br><span class="meta">Según los procesos que tenga asignados. Si un expediente tiene varios procesos, sus responsables lo completan en conjunto.</span></td><td class="si">✓ Los de sus procesos</td><td><b>3, 4 y 5</b>: corrección inmediata, análisis de causa raíz y plan de acción, con la evidencia de ejecución de cada actividad.</td><td class="no">✗</td></tr>
-        <tr><td><b>Unidad de Calidad y Acreditación</b><br><span class="meta">Quien «verifica la implementación» y «coordina proveedores externos».</span></td><td class="si">✓ Todos</td><td><b>6</b> en todos los expedientes, con las evidencias de ejecución. Además <b>3, 4 y 5</b> de los expedientes con proveedor externo.</td><td class="no">✗</td></tr>
+        <tr><td><b>Unidad de Calidad y Acreditación</b><br><span class="meta">«Coordina proveedores externos» y, si se le asigna, «años de expedientes a cargo» (p. ej. todos los de 2025).</span></td><td class="si">✓ Todos</td><td><b>3, 4 y 5</b> de los expedientes con proveedor externo y de los años que tenga a cargo. Si el Comité SGOE se lo encarga, también la <b>6</b>.</td><td class="no">✗</td></tr>
       </tbody></table></div>
     </section>
 
@@ -456,7 +456,8 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
     <div class="fi"><label for="uCargo">Cargo o unidad</label><div class="hl">Por ejemplo: Director de la Escuela de Ingeniería Civil, Comité SGOE.</div><input id="uCargo"></div>
     <div class="fi" id="uProcWrap"><label>Procesos a su cargo</label><div class="hl">Marque los procesos de nivel 0 de los que es responsable. Podrá registrar y editar los expedientes en los que figure alguno de ellos.</div><div class="plist" id="uProc"></div>
       <label class="vtodo"><input type="checkbox" id="uCoordExt"> <span><b>Coordina proveedores externos</b>: puede además editar todo expediente que tenga un proveedor externo involucrado (Matriz FI-GCA-MT-006). Corresponde a la Unidad de Calidad y Acreditación.</span></label>
-      <label class="vtodo"><input type="checkbox" id="uVerifica"> <span><b>Verifica la implementación (sección 6)</b>: ve todos los expedientes y completa su verificación con las evidencias de ejecución. Corresponde a la Unidad de Calidad y Acreditación, como indica el formato.</span></label>
+      <label class="vtodo"><input type="checkbox" id="uVerifica"> <span><b>Verifica la implementación (sección 6)</b>: ve todos los expedientes y completa su verificación con las evidencias de ejecución. Se asigna a quien el Comité SGOE encargue la verificación.</span></label>
+      <div class="fi" style="margin-top:10px"><label for="uAnios">Años de expedientes a cargo</label><div class="hl">Opcional. Si escribe un año (por ejemplo <b>2025</b>), podrá completar <b>todos</b> los AC y OM de ese año, sin importar el proceso. Varios años se separan con coma.</div><input id="uAnios" inputmode="numeric" placeholder="por ejemplo: 2025"></div>
       <label class="vtodo"><input type="checkbox" id="uVerTodo"> <span>Además, puede <b>consultar</b> todos los expedientes de la Facultad (solo ver, no editar)</span></label></div>
     <div class="fi"><label for="uEstado">Estado</label><div class="hl">«Inactivo» le quita el acceso para editar sin borrar su historial.</div><select id="uEstado"><option>Activo</option><option>Inactivo</option></select></div>
     <div class="fi"><label for="uClave">Clave <span id="uClaveReq" class="req">*</span></label><div class="hl" id="uClaveNota">Mínimo 6 caracteres. Escriba una o use «Generar» para crear una al azar. Al guardar, se mostrará el mensaje de acceso listo para entregar.</div>
@@ -578,14 +579,16 @@ function sinConexion(motivo){
 }
 /* Permisos por proceso (igual que en el servidor): códigos del inventario M03, S01.01, … */
 const codigosDe=t=>String(t||"").match(/\b[EMS]\d{2}(?:\.\d{2})*\b/g)||[];
-function puedeEditar(d){if(!SES)return false;if(esAdmin()||SES.verifica)return true;if(SES.coordExt&&d&&String(d.v.provext||"").trim())return true;const m=codigosDe(SES.procesos),e=codigosDe(d?d.v.proceso:"");return m.some(x=>e.some(y=>y===x||y.startsWith(x+".")));}
+const anioExp=d=>((String(d&&d.v?d.v.codigo:"").match(/(\d{4})\s*$/)||[])[1]);
+const porAnio=d=>{const a=anioExp(d);return !!(a&&SES&&(String(SES.anios||"").match(/\d{4}/g)||[]).includes(a));};
+function puedeEditar(d){if(!SES)return false;if(esAdmin()||SES.verifica)return true;if(SES.coordExt&&d&&String(d.v.provext||"").trim())return true;if(porAnio(d))return true;const m=codigosDe(SES.procesos),e=codigosDe(d?d.v.proceso:"");return m.some(x=>e.some(y=>y===x||y.startsWith(x+".")));}
 function avisoPermisos(){
   $("#bNuevo").hidden=!esAdmin();$("#fArchWrap").hidden=!esAdmin();if(!esAdmin()&&FL.arch){FL.arch=false;$("#fArch").checked=false;}
   if(!SES||esAdmin()){$("#banner").innerHTML="";return;}
-  const vtxt=SES.verifica?" Además, como Unidad de Calidad y Acreditación, completa la <b>sección 6 (verificación de la implementación)</b> de todos los expedientes.":"";
+  const vtxt=SES.verifica?" Además, por encargo del Comité SGOE, completa la <b>sección 6 (verificación de la implementación)</b> de todos los expedientes.":"";
   const L=rutasTxt(SES.procesos).map(x=>segsDe(x).slice(-1)[0]);
-  if(!L.length&&SES.coordExt){$("#banner").innerHTML=`<div class="banner ok">Usted completa las <b>secciones 3, 4 y 5</b> de los expedientes que tengan un <b>proveedor externo</b> involucrado (Matriz FI-GCA-MT-006).${vtxt}</div>`;return;}
-  $("#banner").innerHTML=L.length?`<div class="banner ok">Usted completa las <b>secciones 3, 4 y 5</b> (corrección, análisis de causa y plan de acción) de los expedientes de: <b>${L.map(esc).join(" · ")}</b>.${SES.coordExt?" También los que tengan un <b>proveedor externo</b> involucrado.":""}${vtxt}${SES.verTodo&&!SES.verifica?" Además puede consultar todos los demás.":""}</div>`
+  if(!L.length&&(SES.coordExt||SES.anios)){$("#banner").innerHTML=`<div class="banner ok">Usted completa las <b>secciones 3, 4 y 5</b> de ${[SES.coordExt?"los expedientes que tengan un <b>proveedor externo</b> involucrado (Matriz FI-GCA-MT-006)":"",SES.anios?"<b>todos los AC y OM de "+esc(SES.anios)+"</b>":""].filter(Boolean).join(" y de ")}.${vtxt}</div>`;return;}
+  $("#banner").innerHTML=L.length?`<div class="banner ok">Usted completa las <b>secciones 3, 4 y 5</b> (corrección, análisis de causa y plan de acción) de los expedientes de: <b>${L.map(esc).join(" · ")}</b>.${SES.coordExt?" También los que tengan un <b>proveedor externo</b> involucrado.":""}${SES.anios?" También <b>todos los AC y OM de "+esc(SES.anios)+"</b>.":""}${vtxt}${SES.verTodo&&!SES.verifica?" Además puede consultar todos los demás.":""}</div>`
     :`<div class="banner">Su usuario aún no tiene procesos asignados: puede consultar, pero no editar. Pida a un administrador que le asigne sus procesos.</div>`;
 }
 async function post(body){
@@ -730,7 +733,7 @@ const SECS=[
   {k:"causa",l:"Causa raíz determinada",ty:"area",full:1,h:"La causa de fondo que, si se elimina, evita que el problema vuelva a ocurrir."}]},
  {n:5,o:"R",t:"5. Plan de acción",i:"Lo completa el responsable del proceso: actividades concretas para eliminar la causa o lograr la mejora, cada una con su responsable de la implementación, fecha programada, fecha de ejecución y estado.",acts:1},
  {n:6,o:"V",t:"6. Verificación de la implementación",i:"Se completa después de ejecutado el plan: con las evidencias de ejecución de cada actividad se comprueba que todas se hicieron.",f:[
-  {k:"respVerif",l:"Responsable de la verificación",h:"Quién comprueba (normalmente la Unidad de Calidad y Acreditación o el Comité SGOE)."},
+  {k:"respVerif",l:"Responsable de la verificación",h:"Quién comprueba la ejecución: el Comité SGOE."},
   {k:"fVerif",l:"Fecha de verificación",ty:"date",h:"Día en que se comprobó la ejecución de las actividades."},
   {k:"resVerif",l:"Resultado",ty:"sel",o:"resVerif",h:"Verificación de que las acciones se ejecutaron. Conforme: todas las actividades del plan se implementaron. No conforme: quedan actividades pendientes. Déjelo en blanco hasta que se haga la verificación."},
   {k:"obsVerif",l:"Observaciones",ty:"area",full:1,h:"Cambios al plan, hallazgos relacionados u otras precisiones."}]},
@@ -774,7 +777,7 @@ function actHTML(a,i){
     <div class="fi"><label>Estado</label><select data-a="estado">${OPT.actEstado.map(o=>`<option${o===(a.estado||N)?" selected":""}>${o}</option>`).join("")}</select></div>
     <div class="fi"><label>Fecha programada</label><input type="date" data-a="prog" value="${toISO(a.prog)}"></div>
     <div class="fi"><label>Fecha de ejecución</label><input type="date" data-a="ejec" value="${toISO(a.ejec)}"></div>
-    <div class="fi full"><label>Evidencia de la ejecución <span class="req ev-req">*</span></label><div class="hl">Enlace al documento que prueba que la actividad se realizó (acta, oficio, informe, captura) en Drive o en el RID. <b>Es obligatoria para marcarla como «Implementado»</b>: con ella la Unidad de Calidad y Acreditación hace la verificación (sección 6).</div><input type="url" data-a="link" value="${esc(a.link)}" placeholder="https://drive.google.com/…"></div>
+    <div class="fi full"><label>Evidencia de la ejecución <span class="req ev-req">*</span></label><div class="hl">Enlace al documento que prueba que la actividad se realizó (acta, oficio, informe, captura) en Drive o en el RID. <b>Es obligatoria para marcarla como «Implementado»</b>: con ella el Comité SGOE hace la verificación (sección 6).</div><input type="url" data-a="link" value="${esc(a.link)}" placeholder="https://drive.google.com/…"></div>
    </div></div>`;
 }
 function editar(id){
@@ -869,9 +872,9 @@ async function cargarInventario(){try{const r=await fetch(proxy+(proxy.includes(
 
 
 /* ═══════════ secciones por rol (FI-GCA-FR-007) ═══════════ */
-const OWN={C:"Comité SGOE",R:"Responsable del proceso",V:"Unidad de Calidad y Acreditación"};
-const OWN_TXT={C:"el Comité SGOE",R:"el responsable del proceso",V:"la Unidad de Calidad y Acreditación (verificación)"};
-function esResp(d){if(!SES||esAdmin())return !!SES;if(!d)return false;if(SES.coordExt&&String(d.v.provext||"").trim())return true;const m=codigosDe(SES.procesos),e=codigosDe(d.v.proceso);return m.some(x=>e.some(y=>y===x||y.startsWith(x+".")));}
+const OWN={C:"Comité SGOE",R:"Responsable del proceso",V:"Comité SGOE (verificación)"};
+const OWN_TXT={C:"el Comité SGOE",R:"el responsable del proceso",V:"el Comité SGOE (verificación)"};
+function esResp(d){if(!SES||esAdmin())return !!SES;if(!d)return false;if(SES.coordExt&&String(d.v.provext||"").trim())return true;if(porAnio(d))return true;const m=codigosDe(SES.procesos),e=codigosDe(d.v.proceso);return m.some(x=>e.some(y=>y===x||y.startsWith(x+".")));}
 function secEditable(s,d){if(!SES)return false;if(esAdmin())return true;if(s.o==="R")return esResp(d);if(s.o==="V")return !!SES.verifica;return false;}
 function bloquearSecciones(){document.querySelectorAll("#eb fieldset.sec.ro").forEach(fs=>{fs.querySelectorAll("input,select,textarea,button").forEach(x=>{x.disabled=true;x.dataset.ro="1";});});}
 /* ═══════════ IA: sugerencia de criterio de eficacia ═══════════ */
@@ -979,7 +982,7 @@ $("#login_form").addEventListener("submit",async e=>{
   try{
     let r;try{r=await fetch(proxy,{method:"POST",body:JSON.stringify(Object.assign({action:"login"},c))});}catch(x){throw new Error("No hay conexión con QuintaDB en este momento. Revise su internet y vuelva a intentar en unos minutos.");}
     const j=await r.json();if(!j.ok)throw new Error(j.error);
-    SES=Object.assign(c,{correo:j.correo||c.correo,usuario:j.usuario||"",rol:j.rol||"Editor",nombre:j.nombre||c.correo,procesos:j.procesos||"",verTodo:!!j.verTodo,coordExt:!!j.coordExt,verifica:!!j.verifica});try{sessionStorage.setItem("acom-ses",JSON.stringify(SES))}catch(x){}
+    SES=Object.assign(c,{correo:j.correo||c.correo,usuario:j.usuario||"",rol:j.rol||"Editor",nombre:j.nombre||c.correo,procesos:j.procesos||"",verTodo:!!j.verTodo,coordExt:!!j.coordExt,verifica:!!j.verifica,anios:j.anios||""});try{sessionStorage.setItem("acom-ses",JSON.stringify(SES))}catch(x){}
     sesion();cargar();toast("Bienvenido(a), "+(SES.nombre||"").split(" ")[0]+(esAdmin()?". Ingresó como administrador.":". Ya puede registrar y actualizar expedientes."));
     if(trasLogin){const f=trasLogin;trasLogin=null;f();}}
   catch(err){errIngreso(err.message||"No se pudo ingresar.");}
@@ -1000,7 +1003,7 @@ async function admCargar(){
 function pintarUsuarios(){
   const L=[...USERS].sort((a,b)=>(b.fijo-a.fijo)||(a.estado.localeCompare(b.estado))||a.nombre.localeCompare(b.nombre));
   $("#uTabla").innerHTML=L.length?`<table><thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Cargo o unidad</th><th>Procesos a su cargo</th><th>Rol</th><th>Estado</th><th>Contraseña</th><th>Último ingreso</th><th></th></tr></thead><tbody>
-   ${L.map(u=>`<tr><td><b>${esc(u.nombre)}</b></td><td>${u.usuario?`<b class="mono">${esc(u.usuario)}</b>`:'<span class="meta">—</span>'}</td><td>${esc(u.correo)}</td><td>${esc(u.cargo)}</td><td>${u.fijo?'<span class="meta">Todos</span>':(rutasTxt(u.procesos).map(x=>esc(segsDe(x).slice(-1)[0])).join("<br>")||(u.coordExt?"":'<span class="badge warn">Sin asignar</span>'))+(u.coordExt&&!u.fijo?'<div class="meta">+ proveedores externos</div>':"")+(u.verifica&&!u.fijo?'<div class="meta">+ verificación (sección 6)</div>':"")+(u.verTodo&&!u.fijo?'<div class="meta">+ consulta todos</div>':"")}</td>
+   ${L.map(u=>`<tr><td><b>${esc(u.nombre)}</b></td><td>${u.usuario?`<b class="mono">${esc(u.usuario)}</b>`:'<span class="meta">—</span>'}</td><td>${esc(u.correo)}</td><td>${esc(u.cargo)}</td><td>${u.fijo?'<span class="meta">Todos</span>':(rutasTxt(u.procesos).map(x=>esc(segsDe(x).slice(-1)[0])).join("<br>")||(u.coordExt||u.anios?"":'<span class="badge warn">Sin asignar</span>'))+(u.coordExt&&!u.fijo?'<div class="meta">+ proveedores externos</div>':"")+(u.verifica&&!u.fijo?'<div class="meta">+ verificación (sección 6)</div>':"")+(u.anios&&!u.fijo?'<div class="meta">+ todos los AC y OM de '+esc(u.anios)+'</div>':"")+(u.verTodo&&!u.fijo?'<div class="meta">+ consulta todos</div>':"")}</td>
      <td>${u.fijo?'<span class="badge fix">Administrador fijo</span>':'<span class="badge">Editor</span>'}</td>
      <td>${u.estado==="Activo"?'<span class="badge">Activo</span>':'<span class="badge off">Inactivo</span>'}</td>
      <td>${u.clave?`<span class="mono">${esc(u.clave)}</span>`:u.tieneClave?'<span class="meta">Se verá en su próximo ingreso</span>':(u.fijo?"Usa la clave maestra":'<span class="badge warn">Sin clave</span>')}</td>
@@ -1026,7 +1029,7 @@ function abrirUsuario(u){
   {const mios=new Set(rutasTxt(u?u.procesos:"").map(x=>segsDe(x).slice(0,2).join(" › ")));
    $("#uProc").innerHTML=hijosProc([]).map(t=>`<div class="pt">${esc(t)}</div>`+hijosProc([t]).map(n0=>{const k=t+" › "+n0;return `<label class="p0${mios.has(k)?" on":""}"><input type="checkbox" data-uk="${esc(k)}"${mios.has(k)?" checked":""}> <span>${esc(n0)}</span></label>`}).join("")).join("");
    document.querySelectorAll("#uProc input").forEach(cb=>cb.onchange=()=>cb.closest("label").classList.toggle("on",cb.checked));
-   $("#uVerTodo").checked=!!(u&&u.verTodo);$("#uCoordExt").checked=!!(u&&u.coordExt);$("#uVerifica").checked=!!(u&&u.verifica);}$("#uNombre").value=u?u.nombre:"";$("#uCargo").value=u?u.cargo:"";
+   $("#uVerTodo").checked=!!(u&&u.verTodo);$("#uCoordExt").checked=!!(u&&u.coordExt);$("#uVerifica").checked=!!(u&&u.verifica);}$("#uAnios").value=u&&u.anios?u.anios:"";$("#uNombre").value=u?u.nombre:"";$("#uCargo").value=u?u.cargo:"";
   $("#uEstado").value=u?u.estado:"Activo";$("#uEstado").disabled=fijo;
   $("#uClave").value=u?(u.clave||""):"";$("#uClave").required=!u;$("#uClaveReq").hidden=!!u;
   $("#uClaveNota").textContent=u?"Es la contraseña actual de la persona. Puede cambiarla escribiendo otra o con «Generar»; al guardar, se mostrará el mensaje de acceso para entregársela.":"Mínimo 6 caracteres. Escriba una o use «Generar» para crear una al azar. Al guardar, se mostrará el mensaje de acceso listo para entregar.";
@@ -1037,7 +1040,7 @@ $("#uUsarCorreo").onclick=()=>{const c=$("#uCorreo").value.trim().toLowerCase();
 $("#uGen").onclick=()=>{const a="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";const r=new Uint32Array(10);crypto.getRandomValues(r);r.forEach(n=>s+=a[n%a.length]);$("#uClave").value=s;$("#uClave").select();};
 $("#fUser").addEventListener("submit",async e=>{
   e.preventDefault();const b=$("#uBtn");b.disabled=true;$("#uErr").textContent="";
-  const user={id:UED&&UED.id,correo:$("#uCorreo").value.trim(),usuario:$("#uUsuario").value.trim().toLowerCase(),procesos:[...document.querySelectorAll("#uProc input:checked")].map(x=>x.dataset.uk).join(" ; "),verTodo:$("#uVerTodo").checked,coordExt:$("#uCoordExt").checked,verifica:$("#uVerifica").checked,nombre:$("#uNombre").value.trim(),cargo:$("#uCargo").value.trim(),estado:$("#uEstado").value,clave:$("#uClave").value.trim()};
+  const user={id:UED&&UED.id,correo:$("#uCorreo").value.trim(),usuario:$("#uUsuario").value.trim().toLowerCase(),procesos:[...document.querySelectorAll("#uProc input:checked")].map(x=>x.dataset.uk).join(" ; "),verTodo:$("#uVerTodo").checked,coordExt:$("#uCoordExt").checked,verifica:$("#uVerifica").checked,anios:$("#uAnios").value.trim(),nombre:$("#uNombre").value.trim(),cargo:$("#uCargo").value.trim(),estado:$("#uEstado").value,clave:$("#uClave").value.trim()};
   if(UED&&user.clave&&user.clave===(UED.clave||""))delete user.clave;
   try{await post({action:"user_save",user});$("#dUser").close();admCargar();if(user.clave&&(!UED||user.clave!==(UED.clave||"")))mostrarAcceso(user);else toast("Usuario guardado.");}
   catch(err){$("#uErr").textContent=err.message;}finally{b.disabled=false;}
@@ -1088,7 +1091,7 @@ function urpBurbuja(texto){
 function urpGuias(){
   const e=$("#urpExp");if(e)e.innerHTML=urpBurbuja("¡Hola! Soy <b>Urpito</b>, del <b>SGOE FI URP</b> 😊 Aquí ves en qué etapa está cada expediente. Pulsa una etapa para ver solo esos, o baja a la lista y pulsa <b>Ver detalle</b> para leer uno completo. Los números y las fechas los encuentras en la pestaña <b>Indicadores y fechas</b>.");
   const a=$("#urpAdm");if(a)a.innerHTML=urpBurbuja("Aquí das o quitas el permiso para editar. Para que alguien nuevo pueda editar: pulsa <b>Agregar usuario</b>, escribe su correo y su nombre, pulsa <b>Generar</b> para crear su clave y entrégasela en privado.");
-  const f=$("#urpEdit");if(f)f.innerHTML=urpBurbuja(esAdmin()?"Te acompaño 😊 Las secciones son las mismas del formato <b>FI-GCA-FR-007</b>. Cada una indica, en su etiqueta de color, quién la completa: el <b>Comité SGOE</b> (1, 2, 7 y 8), el <b>responsable del proceso</b> (3, 4 y 5) y la <b>Unidad de Calidad y Acreditación</b> (6). En la sección 7 puedes pedirme una sugerencia de criterio de eficacia con IA ✨.":
+  const f=$("#urpEdit");if(f)f.innerHTML=urpBurbuja(esAdmin()?"Te acompaño 😊 Las secciones son las mismas del formato <b>FI-GCA-FR-007</b>. Cada una indica, en su etiqueta de color, quién la completa: el <b>Comité SGOE</b> (1, 2, 7 y 8), el <b>responsable del proceso</b> (3, 4 y 5) y la <b>verificación del Comité SGOE</b> (6). En la sección 7 puedes pedirme una sugerencia de criterio de eficacia con IA ✨.":
     (SES&&SES.verifica&&!esResp(EDIT&&EDIT.id?RECS.find(x=>x.id===EDIT.id):null)?"Te acompaño 😊 A ti te toca la <b>sección 6, Verificación de la implementación</b>. Revisa en el plan de acción (sección 5) la <b>evidencia de ejecución</b> de cada actividad; si todas están implementadas y con evidencia, marca «Conforme». Las demás secciones las ves en modo de solo lectura 🔒.":
     "Te acompaño 😊 A ti te tocan las <b>secciones 3, 4 y 5</b>: la corrección inmediata, el análisis de causa raíz con los 5 Porqués y el plan de acción. Cuando una actividad esté hecha, márcala «Implementado» y pega el <b>enlace a su evidencia</b>. Las demás secciones las completan el Comité SGOE o la Unidad de Calidad; las ves en modo de solo lectura 🔒."));
 }
