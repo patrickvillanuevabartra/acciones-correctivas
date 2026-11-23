@@ -441,8 +441,8 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
       <h2>Roles y permisos</h2>
       <p class="pn">Qué puede hacer cada persona en el aplicativo. El rol se asigna en «Usuarios», aquí abajo.</p>
       <div class="tw"><table class="roles"><thead><tr><th>Rol</th><th>Qué ve</th><th>Secciones del FR-007 que completa</th><th>Archivar, usuarios y respaldos</th></tr></thead><tbody>
-        <tr><td><b>Administrador · Comité SGOE</b><br><span class="meta">Patrick Villanueva y Patricia Vega, fijos.</span></td><td class="si">✓ Todos</td><td>Todas. Registra el expediente (<b>1 y 2</b>), verifica la implementación (<b>6</b>, como responsable de la verificación), evalúa la eficacia (<b>7</b>, con apoyo de la IA) y lo cierra (<b>8</b>).</td><td class="si">✓</td></tr>
-        <tr><td><b>Responsable de proceso</b> (editor)<br><span class="meta">Según los procesos que tenga asignados. Si un expediente tiene varios procesos, sus responsables lo completan en conjunto.</span></td><td class="si">✓ Los de sus procesos</td><td><b>3, 4 y 5</b>: corrección inmediata, análisis de causa raíz y plan de acción, con la evidencia de ejecución de cada actividad.</td><td class="no">✗</td></tr>
+        <tr><td><b>Administrador · Comité SGOE</b><br><span class="meta">Patrick Villanueva y Patricia Vega (fijos) y quienes tengan el rol «Administrador» en Usuarios.</span></td><td class="si">✓ Todos</td><td>Todas. Registra el expediente (<b>1 y 2</b>), verifica la implementación (<b>6</b>, como responsable de la verificación), evalúa la eficacia (<b>7</b>, con apoyo de la IA) y lo cierra (<b>8</b>).</td><td class="si">✓</td></tr>
+        <tr><td><b>Responsable de proceso</b> (editor)<br><span class="meta">Según los procesos que tenga asignados. Si un expediente tiene varios procesos, sus responsables lo completan en conjunto.</span></td><td class="si">✓ Los de sus procesos</td><td><b>3, 4 y 5</b>: corrección inmediata, análisis de causa raíz y plan de acción, con la evidencia de ejecución de cada actividad. Además puede <b>registrar un nuevo AC u OM</b> de sus procesos (secciones 1 a 5); el número lo asigna el sistema.</td><td class="no">✗</td></tr>
         <tr><td><b>Unidad de Calidad y Acreditación</b><br><span class="meta">«Coordina proveedores externos» y, si se le asigna, «años de expedientes a cargo» (p. ej. todos los de 2025).</span></td><td class="si">✓ Todos</td><td><b>3, 4 y 5</b> de los expedientes con proveedor externo y de los años que tenga a cargo. Si el Comité SGOE se lo encarga, también la <b>6</b>.</td><td class="no">✗</td></tr>
       </tbody></table></div>
     </section>
@@ -489,6 +489,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
       <label class="vtodo"><input type="checkbox" id="uVerifica"> <span><b>Verifica la implementación (sección 6)</b>: ve todos los expedientes y completa su verificación con las evidencias de ejecución. Se asigna a quien el Comité SGOE encargue la verificación.</span></label>
       <div class="fi" style="margin-top:10px"><label for="uAnios">Años de expedientes a cargo</label><div class="hl">Opcional. Si escribe un año (por ejemplo <b>2025</b>), podrá completar <b>todos</b> los AC y OM de ese año, sin importar el proceso. Varios años se separan con coma.</div><input id="uAnios" inputmode="numeric" placeholder="por ejemplo: 2025"></div>
       <label class="vtodo"><input type="checkbox" id="uVerTodo"> <span>Además, puede <b>consultar</b> todos los expedientes de la Facultad (solo ver, no editar)</span></label></div>
+    <div class="fi"><label for="uRol">Rol</label><div class="hl"><b>Editor</b>: completa los expedientes de sus procesos y puede registrar nuevos. <b>Administrador</b>: además ve y edita todos los expedientes, evalúa la eficacia, los cierra y gestiona usuarios.</div><select id="uRol"><option>Editor</option><option>Administrador</option></select></div>
     <div class="fi"><label for="uEstado">Estado</label><div class="hl">«Inactivo» le quita el acceso para editar sin borrar su historial.</div><select id="uEstado"><option>Activo</option><option>Inactivo</option></select></div>
     <div class="fi"><label for="uClave">Clave <span id="uClaveReq" class="req">*</span></label><div class="hl" id="uClaveNota">Mínimo 6 caracteres. Escriba una o use «Generar» para crear una al azar. Al guardar, se mostrará el mensaje de acceso listo para entregar.</div>
       <div style="display:flex;gap:8px"><input id="uClave" type="text" autocomplete="off" minlength="6" style="flex:1"><button type="button" class="btn" id="uGen">Generar</button></div></div>
@@ -613,7 +614,7 @@ const anioExp=d=>((String(d&&d.v?d.v.codigo:"").match(/(\d{4})\s*$/)||[])[1]);
 const porAnio=d=>{const a=anioExp(d);return !!(a&&SES&&(String(SES.anios||"").match(/\d{4}/g)||[]).includes(a));};
 function puedeEditar(d){if(!SES)return false;if(esAdmin()||SES.verifica)return true;if(SES.coordExt&&d&&String(d.v.provext||"").trim())return true;if(porAnio(d))return true;const m=codigosDe(SES.procesos),e=codigosDe(d?d.v.proceso:"");return m.some(x=>e.some(y=>y===x||y.startsWith(x+".")));}
 function avisoPermisos(){
-  $("#bNuevo").hidden=!esAdmin();$("#fArchWrap").hidden=!esAdmin();if(!esAdmin()&&FL.arch){FL.arch=false;$("#fArch").checked=false;}
+  $("#bNuevo").hidden=!SES;$("#fArchWrap").hidden=!esAdmin();if(!esAdmin()&&FL.arch){FL.arch=false;$("#fArch").checked=false;}
   if(!SES||esAdmin()){$("#banner").innerHTML="";return;}
   const vtxt=SES.verifica?" Además, por encargo del Comité SGOE, completa la <b>sección 6 (verificación de la implementación)</b> de todos los expedientes.":"";
   const L=rutasTxt(SES.procesos).map(x=>segsDe(x).slice(-1)[0]);
@@ -841,8 +842,7 @@ function editar(id){
   if(!SES){pedirLogin(()=>editar(id));return;}
   const d=id?RECS.find(x=>x.id===id):null;
   if(d&&!puedeEditar(d)){toast("Este expediente no corresponde a sus procesos asignados.",1);return;}
-  if(!d&&!esAdmin()){toast("Los expedientes nuevos los registra el Comité SGOE (secciones 1 y 2 del formato).",1);return;}
-  const v=d?Object.assign({},d.v):Object.assign(Object.fromEntries(Object.keys(F).map(k=>[k,""])),{tipo:"Acción correctiva",estado:"Abierta - plan de acción por aprobar",fecha:toQ(toISO(new Date().toISOString().slice(0,10))),metodo:"5 Porqués"});
+  const v=d?Object.assign({},d.v):Object.assign(Object.fromEntries(Object.keys(F).map(k=>[k,""])),{tipo:"Acción correctiva",estado:esAdmin()?"Abierta - plan de acción por aprobar":"Abierta - pendiente de análisis de causa",fecha:toQ(toISO(new Date().toISOString().slice(0,10))),metodo:"5 Porqués"});
   if(!d)v.codigo=sigCodigo(v.tipo);
   EDIT={id:d?d.id:null,orig:d?d.acts.map(a=>a.id):[]};
   $("#eh").innerHTML=`<div><h2>${d?"Editar "+esc(v.codigo):"Nuevo expediente"}</h2><div class="meta">Los campos con <span class="late">*</span> son obligatorios. Los cambios se guardan directamente en QuintaDB.</div></div><button type="button" class="x" id="eX" aria-label="Cerrar">×</button>`;
@@ -853,6 +853,9 @@ function editar(id){
       el.querySelectorAll("[required]").forEach(x=>x.disabled=!show);el.querySelectorAll("input,select,textarea").forEach(x=>{if(!show)x.dataset.hidden="1";else delete x.dataset.hidden})});
     if(t==="OM"&&!$("#e_clasif").value)$("#e_clasif").value="Oportunidad de mejora";};
   tipoSel.onchange=()=>{if(!EDIT.id)$("#e_codigo").value=sigCodigo(tipoSel.value);aplicarTipo();};
+  if(!d&&!esAdmin()){const es=$("#e_estado");if(es){es.value="Abierta - pendiente de análisis de causa";es.disabled=true;es.dataset.ro="1";}
+    const co=$("#e_codigo");if(co){co.readOnly=true;co.title="El número lo asigna el sistema al guardar.";}
+    $("#eb").insertAdjacentHTML("afterbegin",'<div class="banner ok" style="margin:0 0 12px">Está registrando un <b>nuevo expediente</b>. Complete las secciones 1 a 5. El <b>N.° de registro</b> lo asigna el sistema al guardar, con el siguiente número del año, y el expediente queda en la etapa <b>«Falta analizar la causa»</b>. Marque en «Proceso» al menos uno de sus procesos para poder seguir editándolo.</div>');}
   aplicarTipo();procIniciar(v.proceso);pqIniciar(v.analisis);document.querySelectorAll("#provBox input").forEach(cb=>cb.onchange=()=>cb.closest("label").classList.toggle("on",cb.checked));
   const renum=()=>document.querySelectorAll("#acts .act .ah span").forEach((s,i)=>s.textContent="Actividad "+(i+1));
   $("#addAct").onclick=()=>{$("#acts").insertAdjacentHTML("beforeend",actHTML({},$("#acts").children.length));renum();$("#acts").lastElementChild.querySelector("textarea").focus();};
@@ -867,6 +870,10 @@ $("#fEdit").addEventListener("submit",async e=>{
   procSync();provSync();pqSync();
   {const malas=[...document.querySelectorAll("#acts .act")].filter(el=>!el.querySelector("[data-a=link]").disabled&&el.querySelector("[data-a=estado]").value==="Implementado"&&!el.querySelector("[data-a=link]").value.trim());
    if(malas.length){malas[0].querySelector("[data-a=link]").focus();malas[0].scrollIntoView({block:"center",behavior:"smooth"});toast("Para marcar una actividad como «Implementado» indique el enlace a su evidencia de ejecución.",1);return;}}
+  if(!EDIT.id&&!esAdmin()){const pr=($("#e_proceso")||{}).value||"",pv=($("#e_provext")||{}).value||"";
+    const m=codigosDe(SES.procesos),e2=codigosDe(pr);const mio=m.some(x=>e2.some(y=>y===x||y.startsWith(x+".")))||(SES.coordExt&&pv.trim());
+    if(!pr.trim()){toast("Marque el proceso involucrado en la sección 1.",1);return;}
+    if(!mio&&!SES.anios){toast("Marque al menos uno de sus procesos en «Proceso»; si no, después no podrá seguir editando el expediente.",1);return;}}
   const tipo=$("#e_tipo").value;const values={};
   SECS.forEach(s=>(s.f||[]).forEach(fd=>{const el=$("#e_"+fd.k);if(!el||el.dataset.hidden)return;let val=el.value.trim();
     if(fd.ty==="date")val=toQ(val);else if(fd.ty==="area"||fd.ty==="porques")val=esc(val).replace(/\n/g,"<br />");values[F[fd.k]]=val;}));
@@ -874,7 +881,7 @@ $("#fEdit").addEventListener("submit",async e=>{
   const acts=[...document.querySelectorAll("#acts .act")].map((el,i)=>{const o={};el.querySelectorAll("[data-a]").forEach(x=>{let val=x.value.trim();if(x.type==="date")val=toQ(val);else if(x.tagName==="TEXTAREA")val=esc(val).replace(/\n/g,"<br />");o[A[x.dataset.a]]=val});o[A.n]=String(i+1);return {id:el.dataset.aid||null,v:o}});
   const keep=acts.map(a=>a.id).filter(Boolean);const removed=EDIT.orig.filter(id=>!keep.includes(id));
   const btn=$("#eSave");btn.disabled=true;btn.textContent="Guardando…";
-  try{await post({action:"save",id:EDIT.id,values,acts,removed});$("#dEdit").close();toast("Expediente guardado en QuintaDB.");if(window.URP)URP.festejo("¡Listo!","El expediente quedó guardado en QuintaDB.");await cargar();}
+  try{const rr=await post({action:"save",id:EDIT.id,values,acts,removed});$("#dEdit").close();toast(rr&&rr.codigo&&!EDIT.id?"Expediente registrado como "+rr.codigo+".":"Expediente guardado en QuintaDB.");if(window.URP)URP.festejo("¡Listo!","El expediente quedó guardado en QuintaDB.");await cargar();}
   catch(err){toast("No se guardó: "+err.message,1);if(/clave no es|desactivado|no está registrado|No existe un usuario/i.test(err.message)){SES=null;try{sessionStorage.removeItem("acom-ses")}catch(x){};sesion();}}
   finally{btn.disabled=false;btn.textContent="Guardar en QuintaDB";}
 });
@@ -931,8 +938,8 @@ async function cargarInventario(){try{const r=await fetch(proxy+(proxy.includes(
 const OWN={C:"Comité SGOE",R:"Responsable del proceso",V:"Comité SGOE (verificación)"};
 const OWN_TXT={C:"el Comité SGOE",R:"el responsable del proceso",V:"el Comité SGOE (verificación)"};
 function esResp(d){if(!SES||esAdmin())return !!SES;if(!d)return false;if(SES.coordExt&&String(d.v.provext||"").trim())return true;if(porAnio(d))return true;const m=codigosDe(SES.procesos),e=codigosDe(d.v.proceso);return m.some(x=>e.some(y=>y===x||y.startsWith(x+".")));}
-function secEditable(s,d){if(!SES)return false;if(esAdmin())return true;if(s.o==="R")return esResp(d);if(s.o==="V")return !!SES.verifica;return false;}
-function bloquearSecciones(){document.querySelectorAll("#eb fieldset.sec.ro").forEach(fs=>{fs.querySelectorAll("input,select,textarea,button").forEach(x=>{x.disabled=true;x.dataset.ro="1";});});}
+function secEditable(s,d){if(!SES)return false;if(esAdmin())return true;if(!d&&(s.n<=5))return true;if(s.o==="R")return esResp(d);if(s.o==="V")return !!SES.verifica;return false;}
+function bloquearSecciones(){if(EDIT&&!EDIT.id&&!esAdmin())["estado","familia"].forEach(k=>{const el=$("#e_"+k);if(el){if(k==="estado")el.value="Abierta - pendiente de análisis de causa";el.disabled=true;el.dataset.ro="1";}});document.querySelectorAll("#eb fieldset.sec.ro").forEach(fs=>{fs.querySelectorAll("input,select,textarea,button").forEach(x=>{x.disabled=true;x.dataset.ro="1";});});}
 /* ═══════════ IA: sugerencia de criterio de eficacia ═══════════ */
 function iaDatos(){
   const g=k=>{const el=$("#e_"+k);return el?el.value.trim():""};
@@ -1060,7 +1067,7 @@ function pintarUsuarios(){
   const L=[...USERS].sort((a,b)=>(b.fijo-a.fijo)||(a.estado.localeCompare(b.estado))||a.nombre.localeCompare(b.nombre));
   $("#uTabla").innerHTML=L.length?`<table><thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Cargo o unidad</th><th>Procesos a su cargo</th><th>Rol</th><th>Estado</th><th>Contraseña</th><th>Último ingreso</th><th></th></tr></thead><tbody>
    ${L.map(u=>`<tr><td><b>${esc(u.nombre)}</b></td><td>${u.usuario?`<b class="mono">${esc(u.usuario)}</b>`:'<span class="meta">—</span>'}</td><td>${esc(u.correo)}</td><td>${esc(u.cargo)}</td><td>${u.fijo?'<span class="meta">Todos</span>':(rutasTxt(u.procesos).map(x=>esc(segsDe(x).slice(-1)[0])).join("<br>")||(u.coordExt||u.anios?"":'<span class="badge warn">Sin asignar</span>'))+(u.coordExt&&!u.fijo?'<div class="meta">+ proveedores externos</div>':"")+(u.verifica&&!u.fijo?'<div class="meta">+ verificación (sección 6)</div>':"")+(u.anios&&!u.fijo?'<div class="meta">+ todos los AC y OM de '+esc(u.anios)+'</div>':"")+(u.verTodo&&!u.fijo?'<div class="meta">+ consulta todos</div>':"")}</td>
-     <td>${u.fijo?'<span class="badge fix">Administrador fijo</span>':'<span class="badge">Editor</span>'}</td>
+     <td>${u.fijo?'<span class="badge fix">Administrador fijo</span>':u.rol==="Administrador"?'<span class="badge fix">Administrador</span>':'<span class="badge">Editor</span>'}</td>
      <td>${u.estado==="Activo"?'<span class="badge">Activo</span>':'<span class="badge off">Inactivo</span>'}</td>
      <td>${u.clave?`<span class="mono">${esc(u.clave)}</span>`:u.tieneClave?'<span class="meta">Se verá en su próximo ingreso</span>':(u.fijo?"Usa la clave maestra":'<span class="badge warn">Sin clave</span>')}</td>
      <td>${esc(u.ultimo?u.ultimo.replace(/-/g,"/"):"Nunca")}</td>
@@ -1086,7 +1093,7 @@ function abrirUsuario(u){
    $("#uProc").innerHTML=hijosProc([]).map(t=>`<div class="pt">${esc(t)}</div>`+hijosProc([t]).map(n0=>{const k=t+" › "+n0;return `<label class="p0${mios.has(k)?" on":""}"><input type="checkbox" data-uk="${esc(k)}"${mios.has(k)?" checked":""}> <span>${esc(n0)}</span></label>`}).join("")).join("");
    document.querySelectorAll("#uProc input").forEach(cb=>cb.onchange=()=>cb.closest("label").classList.toggle("on",cb.checked));
    $("#uVerTodo").checked=!!(u&&u.verTodo);$("#uCoordExt").checked=!!(u&&u.coordExt);$("#uVerifica").checked=!!(u&&u.verifica);}$("#uAnios").value=u&&u.anios?u.anios:"";$("#uNombre").value=u?u.nombre:"";$("#uCargo").value=u?u.cargo:"";
-  $("#uEstado").value=u?u.estado:"Activo";$("#uEstado").disabled=fijo;
+  $("#uEstado").value=u?u.estado:"Activo";$("#uEstado").disabled=fijo;$("#uRol").value=fijo||(u&&u.rol==="Administrador")?"Administrador":"Editor";$("#uRol").disabled=fijo;
   $("#uClave").value=u?(u.clave||""):"";$("#uClave").required=!u;$("#uClaveReq").hidden=!!u;
   $("#uClaveNota").textContent=u?"Es la contraseña actual de la persona. Puede cambiarla escribiendo otra o con «Generar»; al guardar, se mostrará el mensaje de acceso para entregársela.":"Mínimo 6 caracteres. Escriba una o use «Generar» para crear una al azar. Al guardar, se mostrará el mensaje de acceso listo para entregar.";
   $("#uErr").textContent=fijo?"Administrador fijo: siempre está activo y con rol de administrador.":"";
@@ -1096,7 +1103,7 @@ $("#uUsarCorreo").onclick=()=>{const c=$("#uCorreo").value.trim().toLowerCase();
 $("#uGen").onclick=()=>{const a="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";const r=new Uint32Array(10);crypto.getRandomValues(r);r.forEach(n=>s+=a[n%a.length]);$("#uClave").value=s;$("#uClave").select();};
 $("#fUser").addEventListener("submit",async e=>{
   e.preventDefault();const b=$("#uBtn");b.disabled=true;$("#uErr").textContent="";
-  const user={id:UED&&UED.id,correo:$("#uCorreo").value.trim(),usuario:$("#uUsuario").value.trim().toLowerCase(),procesos:[...document.querySelectorAll("#uProc input:checked")].map(x=>x.dataset.uk).join(" ; "),verTodo:$("#uVerTodo").checked,coordExt:$("#uCoordExt").checked,verifica:$("#uVerifica").checked,anios:$("#uAnios").value.trim(),nombre:$("#uNombre").value.trim(),cargo:$("#uCargo").value.trim(),estado:$("#uEstado").value,clave:$("#uClave").value.trim()};
+  const user={id:UED&&UED.id,correo:$("#uCorreo").value.trim(),usuario:$("#uUsuario").value.trim().toLowerCase(),procesos:[...document.querySelectorAll("#uProc input:checked")].map(x=>x.dataset.uk).join(" ; "),verTodo:$("#uVerTodo").checked,coordExt:$("#uCoordExt").checked,verifica:$("#uVerifica").checked,anios:$("#uAnios").value.trim(),nombre:$("#uNombre").value.trim(),cargo:$("#uCargo").value.trim(),estado:$("#uEstado").value,rol:$("#uRol").value,clave:$("#uClave").value.trim()};
   if(UED&&user.clave&&user.clave===(UED.clave||""))delete user.clave;
   try{await post({action:"user_save",user});$("#dUser").close();admCargar();if(user.clave&&(!UED||user.clave!==(UED.clave||"")))mostrarAcceso(user);else toast("Usuario guardado.");}
   catch(err){$("#uErr").textContent=err.message;}finally{b.disabled=false;}
@@ -1149,7 +1156,8 @@ function urpGuias(){
   const a=$("#urpAdm");if(a)a.innerHTML=urpBurbuja("Aquí das o quitas el permiso para editar. Para que alguien nuevo pueda editar: pulsa <b>Agregar usuario</b>, escribe su correo y su nombre, pulsa <b>Generar</b> para crear su clave y entrégasela en privado.");
   const f=$("#urpEdit");if(f)f.innerHTML=urpBurbuja(esAdmin()?"Te acompaño 😊 Las secciones son las mismas del formato <b>FI-GCA-FR-007</b>. Cada una indica, en su etiqueta de color, quién la completa: el <b>Comité SGOE</b> (1, 2, 7 y 8), el <b>responsable del proceso</b> (3, 4 y 5) y la <b>verificación del Comité SGOE</b> (6). En la sección 7 puedes pedirme una sugerencia de criterio de eficacia con IA ✨.":
     (SES&&SES.verifica&&!esResp(EDIT&&EDIT.id?RECS.find(x=>x.id===EDIT.id):null)?"Te acompaño 😊 A ti te toca la <b>sección 6, Verificación de la implementación</b>. Revisa en el plan de acción (sección 5) la <b>evidencia de ejecución</b> de cada actividad; si todas están implementadas y con evidencia, marca «Conforme». Las demás secciones las ves en modo de solo lectura 🔒.":
-    "Te acompaño 😊 A ti te tocan las <b>secciones 3, 4 y 5</b>: la corrección inmediata, el análisis de causa raíz con los 5 Porqués y el plan de acción. Cuando una actividad esté hecha, márcala «Implementado» y pega el <b>enlace a su evidencia</b>. Las demás secciones las completan el Comité SGOE o la Unidad de Calidad; las ves en modo de solo lectura 🔒."));
+    (EDIT&&!EDIT.id?"Te acompaño 😊 Vas a registrar un <b>nuevo expediente</b>. Llena la <b>sección 1</b> (tipo, proceso, fuente, requisito) y la <b>sección 2</b> (qué se encontró, con hechos y evidencia). Si ya puedes, avanza con la 3, 4 y 5. El número lo pone el sistema al guardar.":
+    "Te acompaño 😊 A ti te tocan las <b>secciones 3, 4 y 5</b>: la corrección inmediata, el análisis de causa raíz con los 5 Porqués y el plan de acción. Cuando una actividad esté hecha, márcala «Implementado» y pega el <b>enlace a su evidencia</b>. Las demás secciones las completa el Comité SGOE; las ves en modo de solo lectura 🔒.")));
 }
 window.urpTrasAlternar=urpGuias;
 
