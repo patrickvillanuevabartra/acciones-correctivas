@@ -817,7 +817,7 @@ const SECS=[
   {k:"evRev",l:"Evidencia revisada",ty:"area",full:1,h:"Documentos o registros con los que se comprobó la ejecución del plan y su eficacia (actas, oficios, reportes, enlaces). Es el único lugar del formato FR-007 donde se consigna la evidencia."},
   {k:"evPrev",l:"Evidencia prevista",ty:"area",full:1,only:"OM",h:"Documentos o registros que se espera obtener."},
   {k:"obsEf",l:"Observaciones",ty:"area",full:1,h:"Justificación del resultado o del plazo de evaluación."}]},
- {n:8,o:"C",t:"8. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada. Antes de cerrar, mire la <b>lista de verificación</b> de aquí abajo: se marca sola y le dice qué falta.",f:[
+ {n:8,o:"C",t:"8. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada. Antes de cerrar, mire la <b>lista de verificación</b> al final de esta sección: se marca sola y le dice qué falta.",f:[
   {k:"fCierre",l:"Fecha de cierre",ty:"date",h:"Solo cuando el expediente se cierra."},
   {k:"respCierre",l:"Responsable del cierre",h:"Quién da conformidad al cierre."},
   {k:"resCierre",l:"Resultado del cierre",ty:"sel",o:"resCierre",h:"Conforme si todas las acciones se implementaron."},
@@ -875,7 +875,7 @@ function editar(id){
   $("#addAct").onclick=()=>{$("#acts").insertAdjacentHTML("beforeend",actHTML({},$("#acts").children.length));renum();$("#acts").lastElementChild.querySelector("textarea").focus();};
   $("#acts").onclick=e=>{if(e.target.matches("[data-rm]")){e.target.closest(".act").remove();renum();}};
   $("#eX").onclick=$("#eCancel").onclick=()=>$("#dEdit").close();
-  {const f8=document.querySelector('#eb fieldset[data-n="8"] .si');if(f8)f8.insertAdjacentHTML("afterend",'<div id="cierreBox"></div>');cierreRefrescar();
+  {const f8=document.querySelector('#eb fieldset[data-n="8"]');if(f8)f8.insertAdjacentHTML("beforeend",'<div id="cierreBox"></div>');cierreRefrescar();
    $("#eb").addEventListener("input",cierreRefrescar);$("#eb").addEventListener("change",cierreRefrescar);}
   bloquearSecciones();if($("#iaBtn"))$("#iaBtn").onclick=iaCriterio;if($("#planIaBtn"))$("#planIaBtn").onclick=planIa;
   urpGuias();
