@@ -257,6 +257,18 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
 .ia-err{border-color:#f1c4c4;background:#fdecea}
 .ia-load{display:inline-flex;gap:4px;margin-right:6px}.ia-load span{width:8px;height:8px;border-radius:50%;background:#8b6fe0;animation:iab 1s infinite}.ia-load span:nth-child(2){animation-delay:.15s}.ia-load span:nth-child(3){animation-delay:.3s}
 @keyframes iab{0%,80%,100%{opacity:.3}40%{opacity:1}}
+/* Urpito con IA en el análisis, lista de cierre */
+.pq-iarow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}.pq-iah{font-size:13.5px;color:var(--muted);flex:1 1 220px}
+.pq-ev{font-size:15px;padding:6px 10px;border-radius:10px;background:#eef8f2}.pq-ev.warn{background:var(--warn-bg)}
+.pq-iabtns{display:flex;flex-direction:column;gap:8px;align-items:flex-start}.pq-iabtns .btn{white-space:normal;text-align:left}
+.pq-raiz{background:#eef8f2;border-radius:10px;padding:8px 10px}
+.plan-ia{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 10px}
+.plan-ia-act{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px dashed #e3dafa;font-size:15px}.plan-ia-act input{margin-top:5px;width:20px;height:20px}
+.plan-ia-act .ia-d{display:block;font-weight:400;margin-top:2px}
+.cierre{border:2px solid var(--line);border-radius:14px;padding:12px 16px;margin:10px 0;background:var(--card)}.cierre.listo{border-color:var(--ok)}
+.cierre-h{font-weight:700;font-size:16px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.cierre-h span{font-weight:600;color:var(--muted);font-size:14.5px}
+.cierre ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}.cierre li{display:flex;gap:10px;font-size:15px;align-items:flex-start}
+.cierre li div{font-size:15px}.cierre li>span{width:22px;flex:none;text-align:center}.cierre li.no{color:var(--slate)}.cierre small{color:var(--muted)}.cierre-ok{margin-top:8px;font-weight:700;color:var(--ok)}
 /* 5 Porqués */
 #pqBox{display:flex;flex-direction:column;gap:12px}
 .pq-urp{display:flex;gap:12px;align-items:flex-start}.pq-urp .urp-img,.pq-urp img{width:78px;height:auto;flex:0 0 auto}
@@ -750,12 +762,14 @@ function verDetalle(id){
     ${d.acts.map((a,i)=>{const dt=pd(a.prog);return `<tr><td>${esc(a.n||i+1)}</td><td>${esc(a.accion)}${a.link?`<div><a href="${esc(a.link)}" target="_blank" rel="noopener">Ver evidencia</a></div>`:""}</td><td>${esc(a.resp)}</td><td class="mono ${actEst(a)!==I&&dt&&dt<HOY?"late":""}">${fmt(a.prog)||"—"}</td><td class="mono">${fmt(a.ejec)||"—"}</td><td><span class="st"><span class="dot" style="background:${actColor[actEst(a)]||"var(--gray)"}"></span>${esc(actEst(a))}</span></td></tr>`}).join("")}</tbody></table>`:"<p class='meta'>Sin actividades registradas.</p>")+
     blk("Cómo se comprobará que funcionó (criterio de eficacia)",v.criterio)+
     `<h3>Verificación, eficacia y cierre</h3>`+kv([["Resultado de la verificación",v.resVerif],["Fecha de verificación",fmt(v.fVerif)],["Resultado de la eficacia",v.resEf],["Periodo de evaluación",v.periodo],["Fecha programada de evaluación",fmt(v.fProgEf)],["Estado del expediente",v.estado],["Fecha de cierre",fmt(v.fCierre)],["Expediente actualizado al",fmt(v.actualizado)]])+
-    blk("Evidencia revisada",v.evRev||v.evPrev)+blk("Observaciones",[v.obsVerif,v.obsEf,v.obsCierre].filter(Boolean).join("\n\n"));
-  $("#mf").innerHTML=vig(d)?`${esAdmin()?'<button class="btn dan" id="dArch">Archivar</button>':""}<button class="btn" data-close>Cerrar</button>${puedeEditar(d)?'<button class="btn pri" id="dEd">Editar</button>':""}`
+    blk("Evidencia revisada",v.evRev||v.evPrev)+blk("Observaciones",[v.obsVerif,v.obsEf,v.obsCierre].filter(Boolean).join("\n\n"))+
+    (vig(d)?cierreHTML(cierreItems(v,d.acts),false):"");
+  $("#mf").innerHTML=vig(d)?`${esAdmin()?'<button class="btn dan" id="dArch">Archivar</button>':""}<button class="btn" id="dPrint" title="Abre una versión para imprimir o guardar en PDF">🖨️ Imprimir</button><button class="btn" data-close>Cerrar</button>${puedeEditar(d)?'<button class="btn pri" id="dEd">Editar</button>':""}`
                            :`${esAdmin()?'<button class="btn" id="dRest">Restaurar como vigente</button>':""}<button class="btn" data-close>Cerrar</button>`;
   const dlg=$("#dlg");
   $("#dEd")&&($("#dEd").onclick=()=>{dlg.close();editar(id)});
   $("#dArch")&&($("#dArch").onclick=()=>archivar(d,false));
+  $("#dPrint")&&($("#dPrint").onclick=()=>imprimirExp(d));
   $("#dRest")&&($("#dRest").onclick=()=>archivar(d,true));
   dlg.showModal();
 }
@@ -786,7 +800,7 @@ const SECS=[
  {n:4,o:"R",t:"4. Análisis de la causa raíz",i:"Lo completa el responsable del proceso: se busca el porqué de fondo, no el síntoma.",f:[
   {k:"reqAnalisis",l:"¿Requiere análisis de causa?",ty:"sel",o:"siNo",only:"OM",h:"Según el FI-GCA-PR-003, el análisis de causa corresponde a las no conformidades; en una oportunidad de mejora puede no aplicar."},
   {k:"metodo",l:"Metodología aplicada",ty:"sel",o:"metodo",h:"Metodología de análisis de causa aplicada. La cadena de abajo corresponde a los 5 Porqués; si usó Ishikawa, escriba sus causas en los recuadros o resuma el análisis en la causa raíz."},
-  {k:"analisis",l:"Cadena de los 5 Porqués",ty:"porques",full:1,h:"Cada respuesta se convierte en la siguiente pregunta. No tienen que ser exactamente cinco: deténgase cuando llegue a la causa de fondo."},
+  {k:"analisis",l:"Cadena de los 5 Porqués",ty:"porques",full:1,h:"Pregunte «¿por qué?» y responda. Cada respuesta se convierte en la siguiente pregunta. No tienen que ser exactamente cinco: deténgase cuando llegue a la causa de fondo. Si tiene dudas, pulse <b>«🦜 Urpito, revisa este porqué»</b> debajo de cada respuesta."},
   {k:"causa",l:"Causa raíz determinada",ty:"area",full:1,h:"La causa de fondo que, si se elimina, evita que el problema vuelva a ocurrir."}]},
  {n:5,o:"R",t:"5. Plan de acción",i:"Lo completa el responsable del proceso: actividades concretas para eliminar la causa o lograr la mejora, cada una con su responsable de la implementación, fecha programada, fecha de ejecución y estado.",acts:1},
  {n:6,o:"V",t:"6. Verificación de la implementación",i:"Se completa después de ejecutado el plan: con las evidencias de ejecución de cada actividad se comprueba que todas se hicieron.",f:[
@@ -803,7 +817,7 @@ const SECS=[
   {k:"evRev",l:"Evidencia revisada",ty:"area",full:1,h:"Documentos o registros con los que se comprobó la ejecución del plan y su eficacia (actas, oficios, reportes, enlaces). Es el único lugar del formato FR-007 donde se consigna la evidencia."},
   {k:"evPrev",l:"Evidencia prevista",ty:"area",full:1,only:"OM",h:"Documentos o registros que se espera obtener."},
   {k:"obsEf",l:"Observaciones",ty:"area",full:1,h:"Justificación del resultado o del plazo de evaluación."}]},
- {n:8,o:"C",t:"8. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada.",f:[
+ {n:8,o:"C",t:"8. Cierre del expediente",i:"Se cierra cuando la eficacia quedó comprobada. Antes de cerrar, mire la <b>lista de verificación</b> de aquí abajo: se marca sola y le dice qué falta.",f:[
   {k:"fCierre",l:"Fecha de cierre",ty:"date",h:"Solo cuando el expediente se cierra."},
   {k:"respCierre",l:"Responsable del cierre",h:"Quién da conformidad al cierre."},
   {k:"resCierre",l:"Resultado del cierre",ty:"sel",o:"resCierre",h:"Conforme si todas las acciones se implementaron."},
@@ -846,7 +860,7 @@ function editar(id){
   if(!d)v.codigo=sigCodigo(v.tipo);
   EDIT={id:d?d.id:null,orig:d?d.acts.map(a=>a.id):[]};
   $("#eh").innerHTML=`<div><h2>${d?"Editar "+esc(v.codigo):"Nuevo expediente"}</h2><div class="meta">Los campos con <span class="late">*</span> son obligatorios. Los cambios se guardan directamente en QuintaDB.</div></div><button type="button" class="x" id="eX" aria-label="Cerrar">×</button>`;
-  $("#eb").innerHTML='<div class="urpbox" id="urpEdit" style="margin:0 0 14px"></div>'+SECS.map(s=>`<fieldset class="sec${secEditable(s,d)?"":" ro"}" data-only="${s.only||""}" data-n="${s.n}"><legend>${s.t} <span class="own own-${s.o}">${OWN[s.o]}</span></legend>${secEditable(s,d)?"":`<div class="ro-note">🔒 Solo lectura para usted: esta sección la completa ${OWN_TXT[s.o]}.</div>`}<div class="si">${s.i}</div>${s.acts?`<div id="acts">${(d?d.acts:[{}]).map(actHTML).join("")}</div><button type="button" class="btn" id="addAct">＋ Añadir actividad</button>`:`<div class="fg">${s.f.map(fd=>campo(fd,v)).join("")}</div>`}</fieldset>`).join("");
+  $("#eb").innerHTML='<div class="urpbox" id="urpEdit" style="margin:0 0 14px"></div>'+SECS.map(s=>`<fieldset class="sec${secEditable(s,d)?"":" ro"}" data-only="${s.only||""}" data-n="${s.n}"><legend>${s.t} <span class="own own-${s.o}">${OWN[s.o]}</span></legend>${secEditable(s,d)?"":`<div class="ro-note">🔒 Solo lectura para usted: esta sección la completa ${OWN_TXT[s.o]}.</div>`}<div class="si">${s.i}</div>${s.acts?`<div class="ia-acc plan-ia"><button type="button" class="btn ia-btn" id="planIaBtn">🦜 Urpito, propón la corrección y las actividades</button><span class="pq-iah">A partir del hallazgo y la causa raíz, Urpito sugiere qué hacer de inmediato (sección 3) y qué actividades poner en el plan. Usted elige cuáles usar.</span></div><div id="planIaBox"></div><div id="acts">${(d?d.acts:[{}]).map(actHTML).join("")}</div><button type="button" class="btn" id="addAct">＋ Añadir actividad</button>`:`<div class="fg">${s.f.map(fd=>campo(fd,v)).join("")}</div>`}</fieldset>`).join("");
   const tipoSel=$("#e_tipo");
   const aplicarTipo=()=>{const t=tipoSel.value==="Oportunidad de mejora"?"OM":"AC";
     document.querySelectorAll("#eb [data-only]").forEach(el=>{const o=el.dataset.only;const show=!o||o===t;el.style.display=show?"":"none";
@@ -861,7 +875,9 @@ function editar(id){
   $("#addAct").onclick=()=>{$("#acts").insertAdjacentHTML("beforeend",actHTML({},$("#acts").children.length));renum();$("#acts").lastElementChild.querySelector("textarea").focus();};
   $("#acts").onclick=e=>{if(e.target.matches("[data-rm]")){e.target.closest(".act").remove();renum();}};
   $("#eX").onclick=$("#eCancel").onclick=()=>$("#dEdit").close();
-  bloquearSecciones();if($("#iaBtn"))$("#iaBtn").onclick=iaCriterio;
+  {const f8=document.querySelector('#eb fieldset[data-n="8"] .si');if(f8)f8.insertAdjacentHTML("afterend",'<div id="cierreBox"></div>');cierreRefrescar();
+   $("#eb").addEventListener("input",cierreRefrescar);$("#eb").addEventListener("change",cierreRefrescar);}
+  bloquearSecciones();if($("#iaBtn"))$("#iaBtn").onclick=iaCriterio;if($("#planIaBtn"))$("#planIaBtn").onclick=planIa;
   urpGuias();
   $("#dEdit").showModal();
 }
@@ -874,6 +890,9 @@ $("#fEdit").addEventListener("submit",async e=>{
     const m=codigosDe(SES.procesos),e2=codigosDe(pr);const mio=m.some(x=>e2.some(y=>y===x||y.startsWith(x+".")))||(SES.coordExt&&pv.trim());
     if(!pr.trim()){toast("Marque el proceso involucrado en la sección 1.",1);return;}
     if(!mio&&!SES.anios){toast("Marque al menos uno de sus procesos en «Proceso»; si no, después no podrá seguir editando el expediente.",1);return;}}
+  if((($("#e_estado")||{}).value||"")==="Cerrada - eficaz"&&!((RECS.find(x=>x.id===EDIT.id)||{v:{}}).v.estado==="Cerrada - eficaz")){const L=cierreForm(),f=L.filter(x=>!x.ok);
+    if(f.length){cierreRefrescar();const b=$("#cierreBox");if(b)b.scrollIntoView({block:"center",behavior:"smooth"});
+      toast("Todavía no se puede cerrar como eficaz: falta "+f.map(x=>x.f).join("; ")+".",1);return;}}
   const tipo=$("#e_tipo").value;const values={};
   SECS.forEach(s=>(s.f||[]).forEach(fd=>{const el=$("#e_"+fd.k);if(!el||el.dataset.hidden)return;let val=el.value.trim();
     if(fd.ty==="date")val=toQ(val);else if(fd.ty==="area"||fd.ty==="porques")val=esc(val).replace(/\n/g,"<br />");values[F[fd.k]]=val;}));
@@ -885,6 +904,19 @@ $("#fEdit").addEventListener("submit",async e=>{
   catch(err){toast("No se guardó: "+err.message,1);if(/clave no es|desactivado|no está registrado|No existe un usuario/i.test(err.message)){SES=null;try{sessionStorage.removeItem("acom-ses")}catch(x){};sesion();}}
   finally{btn.disabled=false;btn.textContent="Guardar en QuintaDB";}
 });
+function imprimirExp(d){
+  const w=window.open("","_blank");if(!w){toast("El navegador bloqueó la ventana para imprimir. Permita las ventanas emergentes de esta página.",1);return;}
+  const h=$("#mh").cloneNode(true),b=$("#mb").cloneNode(true);h.querySelectorAll("button").forEach(x=>x.remove());
+  w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(d.v.codigo||"Expediente")} · FI-GCA-FR-007</title>
+   <style>body{font-family:Arial,sans-serif;font-size:12.5px;color:#111;margin:24px}h2{margin:4px 0}h3{font-size:14px;margin:16px 0 6px;border-bottom:1px solid #999;padding-bottom:2px}
+   table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:4px 6px;text-align:left;vertical-align:top}.kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}.kv span{display:block;font-size:11px;color:#555}
+   .steps{display:flex;gap:6px;font-size:11px}.steps div{border:1px solid #ccc;padding:2px 6px;border-radius:8px}.steps .cur{font-weight:bold;border-color:#000}
+   .cierre ul{list-style:none;padding:0}.cierre li{display:flex;gap:6px}.hl,.meta{color:#555;font-size:11px}a{color:#111}
+   .encab{display:flex;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:10px}</style></head><body>
+   <div class="encab"><div><b>Facultad de Ingeniería · Universidad Ricardo Palma</b><br>SGOE ISO 21001 · Solicitud de acción correctiva / oportunidad de mejora (FI-GCA-FR-007)</div><div>Impreso: ${new Date().toLocaleDateString("es-PE")}</div></div>
+   ${h.innerHTML}${b.innerHTML}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
 async function archivar(d,restaurar){
   if(MODO!=="vivo"){toast("Sin conexión con QuintaDB.",1);return;}
   if(!SES){pedirLogin(()=>archivar(d,restaurar));return;}
@@ -999,6 +1031,9 @@ function pqPintar(){
         ${p.auto&&p.q?`<div class="pq-auto">✨ Escrita a partir de la respuesta anterior. Puede ajustarla.</div>`:""}
         <label for="pq_a${i}">Respuesta</label>
         <textarea id="pq_a${i}" data-pqa="${i}" rows="2" placeholder="Porque …">${esc(p.a)}</textarea>
+        <div class="pq-iarow"><button type="button" class="btn ia-btn" data-pqia="${i}"${p.a.trim()?"":" disabled"} title="Urpito revisa si esta respuesta explica de verdad el porqué anterior">🦜 Urpito, revisa este porqué</button>
+          <span class="pq-iah">Le dirá si la respuesta es una causa o solo un síntoma, qué documento revisar y cuál sería la siguiente pregunta.</span></div>
+        <div id="pqia${i}">${p.ia?pqIaCard(p.ia,i):""}</div>
       </div>
     </div>${i<n-1?`<div class="pq-flecha"><span>↓</span> la respuesta ${i+1} se convierte en la pregunta ${i+2}</div>`:""}`).join("")+`</div>
     <div class="pq-acc">
@@ -1009,16 +1044,101 @@ function pqPintar(){
   bloquearSecciones();
   document.querySelectorAll("#pqBox [data-pqq]").forEach(t=>t.oninput=()=>{const i=+t.dataset.pqq;PQ[i].q=t.value;PQ[i].auto=false;});
   document.querySelectorAll("#pqBox [data-pqa]").forEach(t=>{t.oninput=()=>{const i=+t.dataset.pqa;PQ[i].a=t.value;
+      if(PQ[i].ia){PQ[i].ia=null;const bx=$("#pqia"+i);if(bx)bx.innerHTML="";}const ib=document.querySelector(`[data-pqia="${i}"]`);if(ib)ib.disabled=!t.value.trim();
       const nx=PQ[i+1];if(nx&&(nx.auto||!nx.q.trim())){nx.q=pqDerivar(t.value);nx.auto=true;const tq=$("#pq_q"+(i+1));if(tq)tq.value=nx.q;}
       const b=$("#pqRaiz");if(b&&i===PQ.length-1)b.disabled=!t.value.trim();};
     t.onblur=()=>{const u=$("#pqBox .pq-urp");if(u)u.outerHTML=pqUrpito();};});
   document.querySelectorAll("#pqBox [data-pqrm]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pqrm;PQ.splice(i,1);
     if(PQ[i]&&PQ[i].auto)PQ[i].q=pqDerivar(PQ[i-1]?PQ[i-1].a:"");pqPintar();});
   const add=$("#pqAdd");if(add)add.onclick=()=>{const u=PQ[PQ.length-1];PQ.push({q:pqDerivar(u.a),a:"",auto:true});pqPintar();const t=$("#pq_a"+(PQ.length-1));if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.focus();}};
+  document.querySelectorAll("#pqBox [data-pqia]").forEach(b=>b.onclick=()=>pqIa(+b.dataset.pqia));
+  pqIaEventos();
   $("#pqRaiz").onclick=()=>{const t=pqLimpia(PQ[PQ.length-1].a);if(!t)return;const c=$("#e_causa");if(!c)return;
     c.value=t.charAt(0).toUpperCase()+t.slice(1)+".";c.scrollIntoView({block:"center",behavior:"smooth"});c.classList.add("pq-flash");setTimeout(()=>c.classList.remove("pq-flash"),1600);
     toast("Listo: la última respuesta quedó como causa raíz. Puede ajustar su redacción.");};
 }
+/* ═══════════ Urpito con IA: revisa cada porqué ═══════════ */
+const PQ_TIPO={causa:["✅","Explica una causa","ok"],sintoma:["⚠️","Todavía es un síntoma: describe lo que pasó, no por qué pasó","warn"],
+  culpa_persona:["⚠️","Señala a una persona: conviene buscar qué falló en el sistema (método, documento, control)","warn"],vaga:["⚠️","Es muy general: conviene precisarla","warn"]};
+async function pqIa(i){
+  const bx=$("#pqia"+i);if(!bx)return;pqSync();
+  bx.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Urpito está revisando el porqué ${i+1}…</div>`;
+  try{const j=await post({action:"ia_porque",expediente:iaDatos(),porques:PQ.map(p=>({q:p.q,a:p.a})),indice:i});
+    PQ[i].ia=j.r||{};bx.innerHTML=pqIaCard(PQ[i].ia,i);pqIaEventos();}
+  catch(e){bx.innerHTML=`<div class="ia-card ia-err">Urpito no pudo revisar este porqué: ${esc(e.message)}</div>`;}
+}
+function pqIaCard(r,i){const t=PQ_TIPO[r.tipo]||["💬","Revisión",""];const ult=i===PQ.length-1;
+  return `<div class="ia-card pq-iacard">${window.URP&&URP.on()?URP.img("ia-urp"):""}<div class="ia-cuerpo">
+    <div class="ia-tit">🦜 Lo que opina Urpito del porqué ${i+1}</div>
+    <div class="pq-ev ${t[2]}">${t[0]} <b>${t[1]}</b></div>
+    ${r.evaluacion?`<div class="ia-d">${esc(r.evaluacion)}</div>`:""}
+    ${r.mejora?`<div class="ia-d"><span>Cómo podría escribirla:</span> ${esc(r.mejora)}</div>`:""}
+    ${r.evidencia?`<div class="ia-d"><span>Para confirmarlo, revise:</span> ${esc(r.evidencia)}</div>`:""}
+    <div class="pq-iabtns">
+      ${r.siguiente&&!r.esRaiz?`<button type="button" class="btn pri" data-pqsig="${i}">➜ Usar como siguiente pregunta: «${esc(r.siguiente)}»</button>`:""}
+      ${r.esRaiz&&r.causaRaiz?`<div class="ia-d pq-raiz"><span>🎯 Urpito cree que ya llegó a la causa de fondo:</span> ${esc(r.causaRaiz)}</div><button type="button" class="btn pri" data-pqcr="${i}">★ Usar como causa raíz</button>`:""}
+      ${r.deteccion&&ult?`<button type="button" class="btn" data-pqdet="${i}">＋ Agregar la pregunta: «${esc(r.deteccion)}»</button>`:""}
+    </div>
+    <div class="ia-nota">Es solo una opinión para ayudarle. <b>Usted decide</b> si la toma en cuenta.</div></div></div>`;}
+function pqIaEventos(){
+  document.querySelectorAll("[data-pqsig]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pqsig,q=PQ[i].ia.siguiente;
+    if(PQ[i+1])PQ[i+1].q=q,PQ[i+1].auto=false;else PQ.push({q,a:"",auto:false});pqPintar();const t=$("#pq_a"+(i+1));if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.focus();}});
+  document.querySelectorAll("[data-pqcr]").forEach(b=>b.onclick=()=>{const c=$("#e_causa");if(!c)return;c.value=PQ[+b.dataset.pqcr].ia.causaRaiz;
+    c.scrollIntoView({block:"center",behavior:"smooth"});c.classList.add("pq-flash");setTimeout(()=>c.classList.remove("pq-flash"),1600);toast("La causa raíz quedó escrita. Revísela y ajústela si hace falta.");});
+  document.querySelectorAll("[data-pqdet]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pqdet;PQ.push({q:PQ[i].ia.deteccion,a:"",auto:false});pqPintar();const t=$("#pq_a"+(PQ.length-1));if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.focus();}});
+}
+
+/* ═══════════ Urpito con IA: propone corrección y actividades ═══════════ */
+async function planIa(){
+  const bx=$("#planIaBox");pqSync();
+  bx.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Urpito está leyendo el hallazgo y la causa raíz para proponer acciones…</div>`;
+  try{const j=await post({action:"ia_plan",expediente:Object.assign(iaDatos(),{correccion:(($("#e_correccion")||{}).value||"").trim()})});const r=j.r||{};const A=r.actividades||[];
+    bx.innerHTML=`<div class="ia-card">${window.URP&&URP.on()?URP.img("ia-urp"):""}<div class="ia-cuerpo">
+      <div class="ia-tit">🦜 Propuesta de Urpito</div>
+      <div class="ia-nota">Marque lo que le sirva y pulse el botón. Después puede corregir cualquier texto. <b>Nada se guarda</b> hasta que pulse «Guardar en QuintaDB».</div>
+      ${r.correccion?`<div class="ia-op"><div class="ia-c"><b>Corrección inmediata</b> (sección 3): ${esc(r.correccion)}</div><button type="button" class="btn" id="planCorr">Usar en «Corrección realizada»</button></div>`:""}
+      ${A.length?`<div class="ia-op"><div class="ia-c"><b>Actividades para eliminar la causa</b> (sección 5)</div>
+        ${A.map((a,k)=>`<label class="plan-ia-act"><input type="checkbox" data-pa="${k}" checked> <span><b>${esc(a.accion)}</b>
+          <span class="ia-d">Responsable sugerido: ${esc(a.responsable||"—")} · Plazo: ${a.plazoDias?esc(a.plazoDias)+" días":"—"}${a.evidencia?" · Evidencia: "+esc(a.evidencia):""}${a.causa?"<br>Ataca: "+esc(a.causa):""}</span></span></label>`).join("")}
+        <button type="button" class="btn pri" id="planAdd">＋ Añadir las marcadas al plan de acción</button></div>`:""}
+      ${r.documentos?`<div class="ia-d"><span>📄 Documentos que convendría actualizar:</span> ${esc(r.documentos)}</div>`:""}
+      ${r.advertencias?`<div class="ia-adv">⚠️ ${esc(r.advertencias)}</div>`:""}
+      <button type="button" class="btn" id="planCerrar">Cerrar la propuesta</button></div></div>`;
+    const pc=$("#planCorr");if(pc)pc.onclick=()=>{const c=$("#e_correccion");if(!c)return;c.value=r.correccion;const q=$("#e_reqCorr");if(q&&!q.value)q.value="Sí";
+      c.scrollIntoView({block:"center",behavior:"smooth"});c.classList.add("pq-flash");setTimeout(()=>c.classList.remove("pq-flash"),1600);toast("Corrección copiada a la sección 3. Revísela.");};
+    const pa=$("#planAdd");if(pa)pa.onclick=()=>{const box=$("#acts");if(!box)return;
+      box.querySelectorAll(".act").forEach(el=>{if(!el.dataset.aid&&!el.querySelector("[data-a=accion]").value.trim())el.remove();});
+      const sel=[...bx.querySelectorAll("[data-pa]:checked")].map(x=>A[+x.dataset.pa]);if(!sel.length){toast("Marque al menos una actividad.",1);return;}
+      sel.forEach(a=>{const f=new Date();f.setDate(f.getDate()+(+a.plazoDias||30));const iso=`${f.getFullYear()}-${two(f.getMonth()+1)}-${two(f.getDate())}`;
+        box.insertAdjacentHTML("beforeend",actHTML({accion:a.accion+(a.evidencia?"\nEvidencia prevista: "+a.evidencia:""),resp:a.responsable||"",prog:toQ(iso)},box.children.length));});
+      box.querySelectorAll(".act .ah span").forEach((sp,k)=>sp.textContent="Actividad "+(k+1));
+      box.lastElementChild.scrollIntoView({block:"center",behavior:"smooth"});toast(sel.length+" actividad(es) añadida(s) al plan. Revise responsables y fechas.");cierreRefrescar();};
+    $("#planCerrar").onclick=()=>bx.innerHTML="";
+  }catch(e){bx.innerHTML=`<div class="ia-card ia-err">Urpito no pudo preparar la propuesta: ${esc(e.message)}</div>`;}
+}
+
+/* ═══════════ Lista de verificación de cierre (con los datos que ya tiene el expediente) ═══════════ */
+function cierreItems(v,acts){const om=/oportunidad/i.test(v.tipo||"");
+  const pend=acts.filter(a=>(a.estado||N)!==I||!String(a.link||"").trim()).length;
+  return [
+   {ok:om||!!String(v.causa||"").trim(),t:"Se determinó la causa raíz",f:"la causa raíz",s:4,h:om?"En una oportunidad de mejora no es obligatoria.":"Sin causa raíz no se sabe qué hay que eliminar."},
+   {ok:acts.length>0,t:"El plan de acción tiene al menos una actividad",f:"actividades en el plan",s:5},
+   {ok:acts.length>0&&!pend,t:"Todas las actividades están «Implementado» y con su evidencia",f:"implementar todas las actividades con su evidencia",s:5,h:pend?`Faltan ${pend}.`:""},
+   {ok:/^Conforme/.test(v.resVerif||""),t:"La verificación de la implementación es «Conforme»",f:"la verificación «Conforme»",s:6},
+   {ok:!!String(v.criterio||"").trim(),t:"Se definió cómo comprobar la eficacia (criterio)",f:"el criterio de eficacia",s:7},
+   {ok:/^Eficaz/i.test(v.resEf||""),t:"La evaluación de la eficacia dio «Eficaz»",f:"el resultado «Eficaz»",s:7,h:"El problema no se repitió o la mejora se logró."},
+   {ok:!!String(v.fCierre||"").trim()&&!!String(v.respCierre||"").trim(),t:"Se registró la fecha y el responsable del cierre",f:"la fecha y el responsable del cierre",s:8}];}
+function cierreHTML(L,editable){const ok=L.filter(x=>x.ok).length,tot=L.length;
+  return `<div class="cierre ${ok===tot?"listo":""}"><div class="cierre-h">📋 Lista de verificación de cierre <span>${ok} de ${tot} cumplidos</span></div>
+   <div class="hl">Se marca sola con lo que ya está registrado en el expediente; no hay que llenar nada aquí. ${editable?"Solo se puede elegir «Cerrada - eficaz» cuando todo esté en verde.":""}</div>
+   <ul>${L.map(x=>`<li class="${x.ok?"si":"no"}"><span>${x.ok?"✅":"⬜"}</span><div>${x.t} <small>(sección ${x.s})</small>${!x.ok&&x.h?`<div class="meta">${x.h}</div>`:""}</div></li>`).join("")}</ul>
+   ${ok===tot?'<div class="cierre-ok">✔ Todo listo: el expediente puede cerrarse como eficaz.</div>':""}</div>`;}
+function cierreForm(){const g=k=>{const el=$("#e_"+k);return el?el.value.trim():""};
+  const v={tipo:g("tipo"),causa:g("causa"),resVerif:g("resVerif"),criterio:g("criterio"),resEf:g("resEf"),fCierre:g("fCierre"),respCierre:g("respCierre")};
+  const acts=[...document.querySelectorAll("#acts .act")].map(el=>({accion:el.querySelector("[data-a=accion]").value.trim(),estado:el.querySelector("[data-a=estado]").value,link:el.querySelector("[data-a=link]").value.trim()})).filter(a=>a.accion);
+  return cierreItems(v,acts);}
+function cierreRefrescar(){const b=$("#cierreBox");if(b)b.innerHTML=cierreHTML(cierreForm(),true);}
+
 function pqDetalle(t,metodo){const L=pqParse(plain(t));if(!L.length)return "";
   return `<h3>Análisis de la causa raíz${metodo?" · "+esc(metodo):""}</h3><div class="pq-det">${L.map((p,i)=>`<div class="pq-dstep"><div class="pq-num">${i+1}</div><div><div class="pq-dq">${esc(p.q)}</div><div class="pq-da">${esc(p.a)}</div></div></div>`).join('<div class="pq-dfl">↓</div>')}</div>`;}
 
