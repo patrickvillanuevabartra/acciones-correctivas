@@ -144,6 +144,11 @@ label.chk input{width:auto}
 .grp h3{display:flex;align-items:baseline;gap:10px;margin:0 0 8px;font-size:16px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
 .grp h3 span{font-size:14px;font-weight:400;color:var(--muted)}
 .row{display:grid;grid-template-columns:150px minmax(0,1fr) 180px 170px auto;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+/* texto completo al pasar el mouse */
+.r-dwrap{position:relative}.r-full{display:none;position:absolute;left:-8px;top:calc(100% + 6px);z-index:50;width:min(560px,80vw);background:#11161d;color:#fff;font-size:15.5px;line-height:1.55;padding:12px 16px;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.r-full b{display:block;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:#9fe3c2;margin-bottom:4px}
+.r-dwrap:hover .r-desc.corta+.r-full,.r-desc.corta:focus+.r-full{display:block}
+.r-desc[data-tip]{cursor:help}.r-desc.corta:hover,.r-desc.corta:focus{text-decoration:underline dotted #8a97a6;text-underline-offset:4px;outline:none}
 /* registro ordenado de expedientes */
 .reg-grp{margin-bottom:30px}
 .reg-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 16px;border-bottom:3px solid var(--ink);padding-bottom:8px;margin-bottom:0}
@@ -152,9 +157,9 @@ label.chk input{width:auto}
 .reg-chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .reg-cab,.reg{display:grid;grid-template-columns:190px minmax(0,1fr) 220px 190px 128px;gap:18px;align-items:center}
 .reg-cab{padding:10px 18px 8px 24px;font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
-.reg-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+.reg-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--shadow)}
 .reg{padding:16px 18px 16px 18px;border-left:6px solid var(--c);border-top:1px solid var(--line);background:var(--card)}
-.reg:first-child{border-top:0}.reg:nth-child(even){background:color-mix(in srgb,var(--bg) 55%,var(--card))}
+.reg:first-child{border-top:0;border-top-left-radius:13px;border-top-right-radius:13px}.reg:last-child{border-bottom-left-radius:13px;border-bottom-right-radius:13px}.reg:nth-child(even){background:color-mix(in srgb,var(--bg) 55%,var(--card))}
 .reg.cer{background:color-mix(in srgb,var(--ok) 5%,var(--card))}.reg.cer .r-desc{color:var(--muted)}.reg.arch{opacity:.6}
 .r-id{display:flex;flex-direction:column;align-items:flex-start;gap:6px}.r-cod{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:19px;white-space:nowrap}
 .r-id .tag{margin:0}
@@ -756,7 +761,7 @@ function filaReg(d){
       ${vig(d)?`<span class="tag ${t}">${t==="AC"?esc(d.v.clasif||"Acción correctiva"):"Oportunidad de mejora"}</span>`:'<span class="tag ARCH">Archivado</span>'}
       ${req?`<span class="tag ISO">ISO ${esc(req)}</span>`:""}</div>
     <div class="r-txt"><div class="r-proc">${esc(procCorto(d.v.proceso)||"Proceso sin registrar")}${d.v.provext?' <span class="tag EXT">Proveedor externo</span>':""}</div>
-      <div class="r-desc">${esc(desc(d))}</div>
+      <div class="r-dwrap"><div class="r-desc" data-tip="1" tabindex="0">${esc(desc(d))}</div><div class="r-full" role="tooltip"><b>Hallazgo completo</b>${esc(desc(d))}</div></div>
       ${toca?`<div class="r-toca">👉 Le toca a ${toca}</div>`:""}</div>
     <div class="r-est"><span class="pill" style="background:${col}">${cer&&d.v.estado==="Cerrada - eficaz"?"✓ ":""}${esc(estShort(d.v.estado))}</span>
       <div class="r-steps" title="Etapa ${Math.min(st+1,5)} de 5">${ETAPAS.map((l,k)=>`<i class="${k<st?"done":k===st?"cur":""}" title="${l}"></i>`).join("")}</div>
@@ -778,6 +783,7 @@ function tarjetas(){
     ||`<div class="empty">No hay expedientes con esos filtros. ${fil?'<button class="btn" id="limpiar">Quitar filtros</button>':""}</div>`;
   document.querySelectorAll("[data-ver]").forEach(b=>b.onclick=()=>verDetalle(b.dataset.ver));
   document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>editar(b.dataset.ed));
+  requestAnimationFrame(()=>document.querySelectorAll(".r-desc[data-tip]").forEach(el=>el.classList.toggle("corta",el.scrollHeight>el.clientHeight+2)));
   const lb=$("#limpiar");if(lb)lb.onclick=()=>{FL={t:"",e:"",f:"",q:"",arch:FL.arch};$("#fEst").value="";$("#fFam").value="";$("#q").value="";document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("on",x.dataset.t===""));pintar();};
 }
 function resumen(){
