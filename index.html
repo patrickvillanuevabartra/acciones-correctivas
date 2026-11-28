@@ -1133,12 +1133,12 @@ function pqIaCard(r,i){const t=PQ_TIPO[r.tipo]||["💬","Revisión",""];const ul
     ${r.mejora?`<div class="ia-d"><span>Cómo podría escribirla:</span> ${esc(r.mejora)}</div>`:""}
     ${r.evidencia?`<div class="ia-d"><span>Para confirmarlo, revise:</span> ${esc(r.evidencia)}</div>`:""}
     <div class="pq-iabtns">
-      ${r.siguiente&&!r.esRaiz?`<div class="pq-camino"><div class="pq-ct">① Siguiente paso recomendado: seguir preguntando «¿por qué?»</div>
+      ${r.siguiente&&!r.esRaiz?`<div class="pq-camino"><div class="pq-ct">Siguiente paso: seguir preguntando «¿por qué?»</div>
         <div class="ia-d">Todavía no se llegó a la causa de fondo. Esta sería la pregunta del <b>porqué ${i+2}</b>; al pulsar el botón se escribe sola y usted solo responde.</div>
         <button type="button" class="btn pri" data-pqsig="${i}">➜ Usar como porqué ${i+2}: «${esc(r.siguiente)}»</button></div>`:""}
       ${r.esRaiz&&r.causaRaiz?`<div class="pq-camino"><div class="pq-ct">🎯 Urpito cree que ya llegó a la causa de fondo</div><div class="ia-d">${esc(r.causaRaiz)}</div><button type="button" class="btn pri" data-pqcr="${i}">★ Usar como causa raíz</button></div>`:""}
-      ${r.deteccion&&ult?`<div class="pq-camino opc"><div class="pq-ct">② Opcional: ¿por qué nadie lo notó antes?</div>
-        <div class="ia-d">Además de la causa del problema, conviene saber por qué los controles no lo detectaron a tiempo. Si lo agrega, queda como un porqué más al final de la cadena.</div>
+      ${r.deteccion&&ult&&r.esRaiz?`<div class="pq-camino opc"><div class="pq-ct">Una pregunta más, para completar (no reemplaza a la anterior)</div>
+        <div class="ia-d">Ya tiene la causa del problema. Le queda una duda distinta: <b>¿por qué nadie lo notó a tiempo?</b> Responderla ayuda a mejorar también los controles. Si la agrega, va al final de la cadena.</div>
         <button type="button" class="btn" data-pqdet="${i}">＋ Agregar esta pregunta: «${esc(r.deteccion)}»</button></div>`:""}
     </div>
     <div class="ia-nota">Es solo una opinión para ayudarle. <b>Usted decide</b> si la toma en cuenta.</div></div></div>`;}
