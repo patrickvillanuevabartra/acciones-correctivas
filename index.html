@@ -294,6 +294,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
 .pq-ev{font-size:15px;padding:6px 10px;border-radius:10px;background:#eef8f2}.pq-ev.warn{background:var(--warn-bg)}
 .pq-iabtns{display:flex;flex-direction:column;gap:8px;align-items:flex-start}.pq-iabtns .btn{white-space:normal;text-align:left}
 .pq-raiz{background:#eef8f2;border-radius:10px;padding:8px 10px}
+.pq-camino{display:flex;flex-direction:column;gap:6px;align-items:flex-start;background:#fff;border:1px solid #e3dafa;border-radius:12px;padding:10px 12px;width:100%}.pq-camino.opc{background:transparent;border-style:dashed}.pq-ct{font-weight:700;font-size:15px}
 .plan-ia{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 10px}
 .plan-ia-act{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px dashed #e3dafa;font-size:15px}.plan-ia-act input{margin-top:5px;width:20px;height:20px}
 .plan-ia-act .ia-d{display:block;font-weight:400;margin-top:2px}
@@ -1132,9 +1133,13 @@ function pqIaCard(r,i){const t=PQ_TIPO[r.tipo]||["💬","Revisión",""];const ul
     ${r.mejora?`<div class="ia-d"><span>Cómo podría escribirla:</span> ${esc(r.mejora)}</div>`:""}
     ${r.evidencia?`<div class="ia-d"><span>Para confirmarlo, revise:</span> ${esc(r.evidencia)}</div>`:""}
     <div class="pq-iabtns">
-      ${r.siguiente&&!r.esRaiz?`<button type="button" class="btn pri" data-pqsig="${i}">➜ Usar como siguiente pregunta: «${esc(r.siguiente)}»</button>`:""}
-      ${r.esRaiz&&r.causaRaiz?`<div class="ia-d pq-raiz"><span>🎯 Urpito cree que ya llegó a la causa de fondo:</span> ${esc(r.causaRaiz)}</div><button type="button" class="btn pri" data-pqcr="${i}">★ Usar como causa raíz</button>`:""}
-      ${r.deteccion&&ult?`<button type="button" class="btn" data-pqdet="${i}">＋ Agregar la pregunta: «${esc(r.deteccion)}»</button>`:""}
+      ${r.siguiente&&!r.esRaiz?`<div class="pq-camino"><div class="pq-ct">① Siguiente paso recomendado: seguir preguntando «¿por qué?»</div>
+        <div class="ia-d">Todavía no se llegó a la causa de fondo. Esta sería la pregunta del <b>porqué ${i+2}</b>; al pulsar el botón se escribe sola y usted solo responde.</div>
+        <button type="button" class="btn pri" data-pqsig="${i}">➜ Usar como porqué ${i+2}: «${esc(r.siguiente)}»</button></div>`:""}
+      ${r.esRaiz&&r.causaRaiz?`<div class="pq-camino"><div class="pq-ct">🎯 Urpito cree que ya llegó a la causa de fondo</div><div class="ia-d">${esc(r.causaRaiz)}</div><button type="button" class="btn pri" data-pqcr="${i}">★ Usar como causa raíz</button></div>`:""}
+      ${r.deteccion&&ult?`<div class="pq-camino opc"><div class="pq-ct">② Opcional: ¿por qué nadie lo notó antes?</div>
+        <div class="ia-d">Además de la causa del problema, conviene saber por qué los controles no lo detectaron a tiempo. Si lo agrega, queda como un porqué más al final de la cadena.</div>
+        <button type="button" class="btn" data-pqdet="${i}">＋ Agregar esta pregunta: «${esc(r.deteccion)}»</button></div>`:""}
     </div>
     <div class="ia-nota">Es solo una opinión para ayudarle. <b>Usted decide</b> si la toma en cuenta.</div></div></div>`;}
 function pqIaEventos(){
