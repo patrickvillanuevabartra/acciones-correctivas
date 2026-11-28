@@ -286,6 +286,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
 .ia-op{background:#fff;border:1px solid #e3dafa;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .ia-d{font-size:14px;color:var(--slate)}.ia-d span{font-weight:600}.ia-adv{font-size:14px;background:var(--warn-bg);border-radius:10px;padding:8px 10px}
 .ia-err{border-color:#f1c4c4;background:#fdecea}
+.ia-espera{flex-basis:100%;font-size:13.5px;color:var(--muted);margin-top:4px}.ia-card:has(.ia-espera){flex-wrap:wrap}
 .ia-load{display:inline-flex;gap:4px;margin-right:6px}.ia-load span{width:8px;height:8px;border-radius:50%;background:#8b6fe0;animation:iab 1s infinite}.ia-load span:nth-child(2){animation-delay:.15s}.ia-load span:nth-child(3){animation-delay:.3s}
 @keyframes iab{0%,80%,100%{opacity:.3}40%{opacity:1}}
 /* Urpito con IA en el análisis, lista de cierre */
@@ -666,7 +667,11 @@ function avisoPermisos(){
     :`<div class="banner">Su usuario aún no tiene procesos asignados: puede consultar, pero no editar. Pida a un administrador que le asigne sus procesos.</div>`;
 }
 async function post(body){
-  const r=await fetch(proxy,{method:"POST",body:JSON.stringify(Object.assign({correo:SES&&SES.correo,clave:SES&&SES.clave},body))});
+  // Las consultas a la IA pueden tardar; se espera hasta 2 minutos antes de avisar
+  const ia=/^ia_/.test(body.action||""),ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),ia?120000:60000);let r;
+  try{r=await fetch(proxy,{method:"POST",signal:ctl.signal,body:JSON.stringify(Object.assign({correo:SES&&SES.correo,clave:SES&&SES.clave},body))});}
+  catch(e){throw new Error(e.name==="AbortError"?(ia?"la IA tardó demasiado en responder. Inténtelo de nuevo en un momento.":"el servidor tardó demasiado en responder. Inténtelo de nuevo."):"no hay conexión con el servidor.");}
+  finally{clearTimeout(tm);}
   const j=await r.json(); if(!j.ok)throw new Error(j.error||"No se pudo guardar"); return j;
 }
 
@@ -1033,7 +1038,7 @@ function iaDatos(){
     actividades:[...document.querySelectorAll("#acts .act")].map(el=>{const o={};el.querySelectorAll("[data-a]").forEach(x=>o[x.dataset.a]=x.value.trim());return o;})};
 }
 async function iaCriterio(){
-  const box=$("#iaBox");box.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Analizando el caso: descripción, causa raíz, plan de acción y evidencias…</div>`;
+  const box=$("#iaBox");box.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Analizando el caso: descripción, causa raíz, plan de acción y evidencias…<div class="ia-espera">Suele tardar entre 10 y 40 segundos. Puede seguir llenando el formulario mientras tanto.</div></div>`;
   try{const j=await post({action:"ia_criterio",expediente:iaDatos()});
     const ops=j.opciones||[];
     box.innerHTML=`<div class="ia-card">${window.URP&&URP.on()?URP.img("ia-urp"):""}<div class="ia-cuerpo"><div class="ia-tit">✨ Sugerencias de la IA para el criterio de eficacia</div>
@@ -1114,7 +1119,7 @@ const PQ_TIPO={causa:["✅","Explica una causa","ok"],sintoma:["⚠️","Todaví
   culpa_persona:["⚠️","Señala a una persona: conviene buscar qué falló en el sistema (método, documento, control)","warn"],vaga:["⚠️","Es muy general: conviene precisarla","warn"]};
 async function pqIa(i){
   const bx=$("#pqia"+i);if(!bx)return;pqSync();
-  bx.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Urpito está revisando el porqué ${i+1}…</div>`;
+  bx.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Urpito está revisando el porqué ${i+1}…<div class="ia-espera">Suele tardar entre 10 y 40 segundos. Puede seguir llenando el formulario mientras tanto.</div></div>`;
   try{const j=await post({action:"ia_porque",expediente:iaDatos(),porques:PQ.map(p=>({q:p.q,a:p.a})),indice:i});
     PQ[i].ia=j.r||{};bx.innerHTML=pqIaCard(PQ[i].ia,i);pqIaEventos();}
   catch(e){bx.innerHTML=`<div class="ia-card ia-err">Urpito no pudo revisar este porqué: ${esc(e.message)}</div>`;}
@@ -1143,7 +1148,7 @@ function pqIaEventos(){
 /* ═══════════ Urpito con IA: propone corrección y actividades ═══════════ */
 async function planIa(){
   const bx=$("#planIaBox");pqSync();
-  bx.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Urpito está leyendo el hallazgo y la causa raíz para proponer acciones…</div>`;
+  bx.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Urpito está leyendo el hallazgo y la causa raíz para proponer acciones…<div class="ia-espera">Suele tardar entre 10 y 40 segundos. Puede seguir llenando el formulario mientras tanto.</div></div>`;
   try{const j=await post({action:"ia_plan",expediente:Object.assign(iaDatos(),{correccion:(($("#e_correccion")||{}).value||"").trim()})});const r=j.r||{};const A=r.actividades||[];
     bx.innerHTML=`<div class="ia-card">${window.URP&&URP.on()?URP.img("ia-urp"):""}<div class="ia-cuerpo">
       <div class="ia-tit">🦜 Propuesta de Urpito</div>
