@@ -294,6 +294,7 @@ fieldset.sec.ro input,fieldset.sec.ro select,fieldset.sec.ro textarea{background
 .pq-ev{font-size:15px;padding:6px 10px;border-radius:10px;background:#eef8f2}.pq-ev.warn{background:var(--warn-bg)}
 .pq-iabtns{display:flex;flex-direction:column;gap:8px;align-items:flex-start}.pq-iabtns .btn{white-space:normal;text-align:left}
 .pq-raiz{background:#eef8f2;border-radius:10px;padding:8px 10px}
+.pq-aviso{display:flex;flex-direction:column;gap:8px;background:var(--warn-bg);border:1.5px solid #f0d28a;border-radius:14px;padding:12px 16px;margin-top:4px}
 .pq-camino{display:flex;flex-direction:column;gap:6px;align-items:flex-start;background:#fff;border:1px solid #e3dafa;border-radius:12px;padding:10px 12px;width:100%}.pq-camino.opc{background:transparent;border-style:dashed}.pq-ct{font-weight:700;font-size:15px}
 .plan-ia{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 10px}
 .plan-ia-act{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px dashed #e3dafa;font-size:15px}.plan-ia-act input{margin-top:5px;width:20px;height:20px}
@@ -1094,6 +1095,7 @@ function pqPintar(){
         <div id="pqia${i}">${p.ia?pqIaCard(p.ia,i):""}</div>
       </div>
     </div>${i<n-1?`<div class="pq-flecha"><span>↓</span> la respuesta ${i+1} se convierte en la pregunta ${i+2}</div>`:""}`).join("")+`</div>
+    ${pqAviso()}
     <div class="pq-acc">
       ${n<PQ_MAX?`<button type="button" class="btn" id="pqAdd">＋ Preguntar otro porqué</button>`:""}
       <button type="button" class="btn pri" id="pqRaiz"${PQ[n-1].a.trim()?"":" disabled"}>★ Usar la última respuesta como causa raíz</button>
@@ -1122,7 +1124,7 @@ async function pqIa(i){
   const bx=$("#pqia"+i);if(!bx)return;pqSync();
   bx.innerHTML=`<div class="ia-card"><div class="ia-load"><span></span><span></span><span></span></div> Urpito está revisando el porqué ${i+1}…<div class="ia-espera">Suele tardar entre 10 y 40 segundos. Puede seguir llenando el formulario mientras tanto.</div></div>`;
   try{const j=await post({action:"ia_porque",expediente:iaDatos(),porques:PQ.map(p=>({q:p.q,a:p.a})),indice:i});
-    PQ[i].ia=j.r||{};bx.innerHTML=pqIaCard(PQ[i].ia,i);pqIaEventos();}
+    PQ[i].ia=j.r||{};if(i===PQ.length-1&&PQ[i].ia.esRaiz&&PQ[i].ia.deteccion){pqPintar();const c=$("#pqia"+i);if(c)c.scrollIntoView({block:"nearest",behavior:"smooth"});}else{bx.innerHTML=pqIaCard(PQ[i].ia,i);pqIaEventos();}}
   catch(e){bx.innerHTML=`<div class="ia-card ia-err">Urpito no pudo revisar este porqué: ${esc(e.message)}</div>`;}
 }
 function pqIaCard(r,i){const t=PQ_TIPO[r.tipo]||["💬","Revisión",""];const ult=i===PQ.length-1;
@@ -1137,12 +1139,18 @@ function pqIaCard(r,i){const t=PQ_TIPO[r.tipo]||["💬","Revisión",""];const ul
         <div class="ia-d">Todavía no se llegó a la causa de fondo. Esta sería la pregunta del <b>porqué ${i+2}</b>; al pulsar el botón se escribe sola y usted solo responde.</div>
         <button type="button" class="btn pri" data-pqsig="${i}">➜ Usar como porqué ${i+2}: «${esc(r.siguiente)}»</button></div>`:""}
       ${r.esRaiz&&r.causaRaiz?`<div class="pq-camino"><div class="pq-ct">🎯 Urpito cree que ya llegó a la causa de fondo</div><div class="ia-d">${esc(r.causaRaiz)}</div><button type="button" class="btn pri" data-pqcr="${i}">★ Usar como causa raíz</button></div>`:""}
-      ${r.deteccion&&ult&&r.esRaiz?`<div class="pq-camino opc"><div class="pq-ct">Una pregunta más, para completar (no reemplaza a la anterior)</div>
-        <div class="ia-d">Ya tiene la causa del problema. Le queda una duda distinta: <b>¿por qué nadie lo notó a tiempo?</b> Responderla ayuda a mejorar también los controles. Si la agrega, va al final de la cadena.</div>
-        <button type="button" class="btn" data-pqdet="${i}">＋ Agregar esta pregunta: «${esc(r.deteccion)}»</button></div>`:""}
     </div>
     <div class="ia-nota">Es solo una opinión para ayudarle. <b>Usted decide</b> si la toma en cuenta.</div></div></div>`;}
+/* Al final del análisis: llamada de atención sobre la detección (no forma parte de la cadena principal) */
+function pqAviso(){const u=PQ.length?PQ[PQ.length-1]:null,r=u&&u.ia;
+  if(!r||!r.esRaiz||!r.deteccion||PQ.some(p=>p.q.trim()===r.deteccion.trim()))return "";
+  return `<div class="pq-aviso"><div class="pq-ct">💡 Antes de terminar: ¿por qué nadie lo notó a tiempo?</div>
+    <div class="ia-d">Ya llegó a la causa del problema. Urpito le sugiere revisar también por qué los controles no lo detectaron antes. <b>Es opcional</b>: si la responde, puede salir una actividad más para el plan (por ejemplo, mejorar una revisión o un registro).</div>
+    <div class="ia-d"><span>Pregunta sugerida:</span> «${esc(r.deteccion)}»</div>
+    <div class="pq-iabtns" style="flex-direction:row;flex-wrap:wrap"><button type="button" class="btn" id="pqDetAdd">＋ Agregarla al final del análisis</button><button type="button" class="btn" id="pqDetNo">No es necesaria</button></div></div>`;}
 function pqIaEventos(){
+  const da=$("#pqDetAdd");if(da)da.onclick=()=>{const r=PQ[PQ.length-1].ia;PQ.push({q:r.deteccion,a:"",auto:false});pqPintar();const t=$("#pq_a"+(PQ.length-1));if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.focus();}};
+  const dn=$("#pqDetNo");if(dn)dn.onclick=()=>{PQ[PQ.length-1].ia.deteccion="";const a=dn.closest(".pq-aviso");if(a)a.remove();};
   document.querySelectorAll("[data-pqsig]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pqsig,q=PQ[i].ia.siguiente;
     if(PQ[i+1])PQ[i+1].q=q,PQ[i+1].auto=false;else PQ.push({q,a:"",auto:false});pqPintar();const t=$("#pq_a"+(i+1));if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.focus();}});
   document.querySelectorAll("[data-pqcr]").forEach(b=>b.onclick=()=>{const c=$("#e_causa");if(!c)return;c.value=PQ[+b.dataset.pqcr].ia.causaRaiz;
